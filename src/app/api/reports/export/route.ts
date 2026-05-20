@@ -5,6 +5,24 @@ import type { ReportScope } from "@/lib/reports/operational-reports";
 import { recordAuditEvent } from "@/lib/supabase/audit";
 
 export const runtime = "nodejs";
+const NO_STORE_HEADERS = {
+  "Cache-Control": "no-store, max-age=0",
+  Pragma: "no-cache",
+  Vary: "Cookie",
+  "X-Content-Type-Options": "nosniff",
+};
+
+function jsonNoStore(body: unknown, init?: ResponseInit) {
+  const headers = new Headers(init?.headers);
+  Object.entries(NO_STORE_HEADERS).forEach(([key, value]) => {
+    headers.set(key, value);
+  });
+
+  return NextResponse.json(body, {
+    ...init,
+    headers,
+  });
+}
 
 function normalizeScope(value: string | null): ReportScope {
   return value === "global" ? "global" : "local";
@@ -23,7 +41,7 @@ export async function GET(request: NextRequest) {
     const type = request.nextUrl.searchParams.get("type");
 
     if (!isReportExportType(type)) {
-      return NextResponse.json({ error: "Invalid report export type." }, { status: 400 });
+      return jsonNoStore({ error: "Invalid report export type." }, { status: 400 });
     }
 
     const scope = normalizeScope(request.nextUrl.searchParams.get("scope"));
@@ -45,9 +63,9 @@ export async function GET(request: NextRequest) {
 
     return new Response(csv, {
       headers: {
-        "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${filename}"`,
-        "Cache-Control": "no-store",
+        "Content-Type": "text/csv; charset=utf-8",
+        ...NO_STORE_HEADERS,
       },
     });
   } catch (error) {
@@ -57,6 +75,6 @@ export async function GET(request: NextRequest) {
       : message.includes("Super admin") || message.includes("Approved account")
         ? 403
         : 500;
-    return NextResponse.json({ error: message }, { status });
+    return jsonNoStore({ error: message }, { status });
   }
 }

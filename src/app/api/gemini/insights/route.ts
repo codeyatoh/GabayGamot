@@ -20,6 +20,11 @@ const GEMINI_MODEL_CHAIN = [
 
 const RETRYABLE_STATUS_CODES = new Set([429, 503, 502, 500]);
 const VALID_SEVERITIES = new Set<InsightSeverity>(["low", "medium", "high"]);
+const NO_STORE_HEADERS = {
+  "Cache-Control": "no-store, max-age=0",
+  Pragma: "no-cache",
+  Vary: "Cookie",
+};
 
 type ProfileRow = {
   role: "bhw" | "super_admin";
@@ -185,6 +190,18 @@ type GeminiPayload = {
 
 function normalizeScope(value: unknown): InsightScope {
   return value === "global" ? "global" : "local";
+}
+
+function jsonNoStore(body: unknown, init?: ResponseInit) {
+  const headers = new Headers(init?.headers);
+  Object.entries(NO_STORE_HEADERS).forEach(([key, value]) => {
+    headers.set(key, value);
+  });
+
+  return NextResponse.json(body, {
+    ...init,
+    headers,
+  });
 }
 
 function readOne<T>(value: T | T[] | null | undefined): T | null {
@@ -881,7 +898,7 @@ export async function POST(req: NextRequest) {
 
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonNoStore({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { data: profile, error: profileError } = await supabase
@@ -891,11 +908,11 @@ export async function POST(req: NextRequest) {
       .maybeSingle<ProfileRow>();
 
     if (profileError || !profile || profile.approval_status !== "approved") {
-      return NextResponse.json({ error: "Approved account required." }, { status: 403 });
+      return jsonNoStore({ error: "Approved account required." }, { status: 403 });
     }
 
     if (requestedScope === "global" && profile.role !== "super_admin") {
-      return NextResponse.json({ error: "Super admin access required for global insights." }, { status: 403 });
+      return jsonNoStore({ error: "Super admin access required for global insights." }, { status: 403 });
     }
 
     const { data: ownCenter } = await supabase
@@ -918,7 +935,7 @@ export async function POST(req: NextRequest) {
     const centers = centerResult.rows;
 
     if (centers.length === 0) {
-      return NextResponse.json({
+      return jsonNoStore({
         insights: [],
         message: NOT_ENOUGH_INSIGHT_DATA_MESSAGE,
         source: "none",
@@ -1015,7 +1032,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!hasEnoughData(summary)) {
-      return NextResponse.json({
+      return jsonNoStore({
         insights: [],
         message: NOT_ENOUGH_INSIGHT_DATA_MESSAGE,
         source: "none",
@@ -1025,7 +1042,7 @@ export async function POST(req: NextRequest) {
 
     const geminiResult = await generateGeminiInsights(summary);
     if (geminiResult) {
-      return NextResponse.json({
+      return jsonNoStore({
         insights: geminiResult.insights,
         source: "gemini",
         model: geminiResult.modelName,
@@ -1035,7 +1052,7 @@ export async function POST(req: NextRequest) {
     }
 
     const fallbackInsights = buildHeuristicInsights(summary);
-    return NextResponse.json({
+    return jsonNoStore({
       insights: fallbackInsights,
       message: fallbackInsights.length === 0 ? NOT_ENOUGH_INSIGHT_DATA_MESSAGE : null,
       source: "local-analysis",
@@ -1045,6 +1062,6 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown insight generation error.";
     console.error("Error in Gemini insights route handler:", error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return jsonNoStore({ error: message }, { status: 500 });
   }
 }

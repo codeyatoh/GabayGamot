@@ -5,11 +5,22 @@ import { ensureProfileForUser } from "@/lib/supabase/profiles";
 import { createClient } from "@/lib/supabase/server";
 
 function getSafeNextPath(value: string | null) {
-  if (!value || !value.startsWith("/")) {
+  if (
+    !value ||
+    !value.startsWith("/") ||
+    value.startsWith("//") ||
+    value.includes("\\") ||
+    value.includes("\r") ||
+    value.includes("\n")
+  ) {
     return "/dashboard";
   }
 
-  return value;
+  try {
+    return new URL(value, "http://localhost").pathname;
+  } catch {
+    return "/dashboard";
+  }
 }
 
 export async function GET(request: NextRequest) {

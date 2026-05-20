@@ -4,7 +4,11 @@
 
 Late-phase maintenance alignment completed for `D:\Clients Project\Codex.GabayGamot`.
 
-PHASE 17 is now completed as an additive Reports, Audit Trail, and Export Basics layer. The implementation keeps the existing authentication, inventory, scanning, dispensing, referral, patient, consultation, and AI insight flows intact while adding protected operational report pages, authenticated CSV exports, and a lightweight audit trail table/helper.
+A focused public navbar and palette polish pass is also complete: the header now follows the approved landing page navigation labels, expands more openly at the top, becomes rounded and compact after scroll, keeps an icon-only theme toggle with animated mobile menu transitions, and uses readable light/dark colors for links, cards, and buttons.
+
+A focused public hero polish pass is also complete: the landing hero now uses a full-view centered shadcn-style layout while keeping the real GabayGamot consultation-first message, existing login/dashboard routes, readable healthcare colors, and a tech stack logo row.
+
+PHASE 19 is now completed as an additive Responsive QA, PWA Readiness, and Final Testing pass. The implementation keeps the existing authentication, inventory, scanning, dispensing, referral, patient, consultation, AI insight, reporting, and audit flows intact while adding lightweight install metadata, improving small-screen protected navigation, and completing final verification checks.
 
 ## Completed Phases
 
@@ -26,8 +30,135 @@ PHASE 17 is now completed as an additive Reports, Audit Trail, and Export Basics
 - [x] PHASE 15 - Nearby Barangay Medicine Referral
 - [x] PHASE 16 - Actionable Gemini AI Insights
 - [x] PHASE 17 - Reports, Audit Trail, and Export Basics
-- [ ] PHASE 18 - Security Hardening and RLS Review
-- [ ] PHASE 19 - Responsive QA, PWA Readiness, and Final Testing
+- [x] PHASE 18 - Security Hardening and RLS Review
+- [x] PHASE 19 - Responsive QA, PWA Readiness, and Final Testing
+
+## Phase 19 Responsive QA, PWA Readiness, and Final Testing Summary
+
+- Status: completed
+- Scope completed:
+  - added `src/app/manifest.ts` for install metadata, theme colors, start URL, scope, and app categories
+  - added generated app icons at `src/app/icon.tsx` and `src/app/apple-icon.tsx`
+  - upgraded `src/app/layout.tsx` metadata with better app description, title template, app name, Apple web app metadata, and mobile viewport/theme color settings
+  - improved `ProtectedShell` mobile behavior by replacing the always-visible small-screen sidebar with a collapsible navigation panel and tighter mobile spacing
+  - updated the public header with the approved landing navigation labels and added a working icon-only light/dark toggle that stores the user preference locally, plus top-state expansion and rounded scrolled-state behavior
+  - updated landing page copy so it reflects the current platform status instead of earlier-phase placeholder language
+  - added the missing `#stack` landing section so the public header navigation no longer points to a missing anchor
+  - corrected public landing light/dark color contrast so nav links, cards, muted copy, and button text stay readable
+  - updated only the public landing hero with a full-view centered layout, consultation-first copy, existing route CTAs, and tech stack logo-style badges
+- Existing features preserved:
+  - login, signup, onboarding, and pending-approval flow
+  - protected dashboards and role-based routing
+  - patient and consultation-first workflow
+  - scan, inventory, dispense, referrals, AI insights, reports, and audit trail
+  - server-side Gemini and Supabase integrations
+- PWA readiness result:
+  - install manifest exists
+  - generated app icon and Apple touch icon routes exist
+  - theme color and viewport metadata are set for mobile browser chrome
+  - no service worker or offline cache was added in this phase to avoid risky caching behavior on authenticated healthcare flows
+- Files changed:
+  - `src/app/layout.tsx`
+  - `src/app/manifest.ts`
+  - `src/app/icon.tsx`
+  - `src/app/apple-icon.tsx`
+  - `src/components/foundation/protected-shell.tsx`
+  - `src/app/page.tsx`
+  - `src/components/foundation/site-header.tsx`
+  - `src/components/ui/button.tsx`
+  - `src/components/ui/card.tsx`
+  - `src/app/globals.css`
+  - `.agent/progress.md`
+- Manual review needed:
+  - if a fully branded production install icon is preferred later, replace the generated icon routes with final approved image assets
+  - if offline support is ever required, review it as a separate controlled phase because authenticated medical inventory flows should not receive opportunistic caching by default
+  - hosted Supabase still needs the pending Phase 18 migration applied before its security hardening is live there
+- Commands run:
+  - re-read `.agent/system-workflow.md`
+  - re-read `.agent/project-scaffold-reference.md`
+  - re-read `.agent/progress.md`
+  - re-read `.agent/setup-guide.md`
+  - re-read `.agent/manual-setup-checklist.md`
+  - re-read `AGENTS.md`
+  - inspected Next.js metadata docs for manifest and app icons
+  - inspected app shell, landing, login, and protected page files
+  - verified public and protected mobile DOM states in the in-app browser
+  - verified `http://localhost:3000/manifest.webmanifest`
+  - verified `http://localhost:3000/icon`
+  - verified `http://localhost:3000/apple-icon`
+  - verified public landing button/link/card colors in light and dark mode through the browser
+  - verified the updated public hero heading, primary CTA, and tech stack row render correctly in the browser
+  - `cmd /c npm run lint`
+  - `cmd /c npm run typecheck`
+  - `cmd /c npm run build`
+- Verification result:
+  - manifest route returned `200` with `application/manifest+json`
+  - icon route returned `200` with `image/png`
+  - apple-icon route returned `200` with `image/png`
+  - mobile landing page loaded cleanly at `390x844`
+  - authenticated mobile admin shell exposed the new collapsible navigation successfully
+  - public landing primary buttons render white text on blue, outline buttons render readable text, and nav links stay legible in both themes
+  - updated hero heading, CTA, and tech stack row rendered successfully on the public landing page
+  - lint passed
+  - typecheck passed
+  - build passed
+- Next recommended step:
+  - begin targeted UI improvement and self-analysis on top of the now-complete Phase 19 base
+
+## Phase 18 Security Hardening and RLS Review Summary
+
+- Status: completed
+- Scope completed:
+  - created `20260520183129_phase_18_security_hardening_rls_review.sql` for additive database hardening only
+  - tightened `dispense_logs`, `illness_logs`, and `referrals` RLS so only approved authenticated users can access those operational tables through normal clients
+  - added a proper `WITH CHECK` clause to referral updates so direct API writes cannot move referral rows outside an authorized center scope
+  - added explicit authenticated and service-role grants for older operational tables to reduce access drift across environments
+  - aligned the `bhw-proof-documents` storage bucket MIME rules to the current document-only registration policy: PDF, DOC, and DOCX
+  - expanded `src/proxy.ts` matcher coverage to include `/admin`, `/reports`, `/illnesses`, `/api/gemini/insights`, and `/api/reports/export`
+  - hardened `/auth/confirm` redirect sanitization so malformed or double-slash `next` values fall back safely to `/dashboard`
+  - added explicit no-store headers to AI Insights and report export responses
+  - fixed the onboarding registration form so it now submits separate first, middle, last, and suffix fields to match the existing server action contract
+  - aligned onboarding proof-document input to the same PDF/DOC/DOCX-only rule already used on signup
+- Existing features preserved:
+  - authentication and BHW approval workflow
+  - patient records and consultation-first flow
+  - medicine inventory, scan review, and manual quantity logic
+  - dispensing and stock deduction
+  - referral creation, completion, and cancellation
+  - actionable Gemini AI insights
+  - reports, CSV exports, and audit logging
+- Files changed:
+  - `supabase/migrations/20260520183129_phase_18_security_hardening_rls_review.sql`
+  - `src/proxy.ts`
+  - `src/app/auth/confirm/route.ts`
+  - `src/app/api/gemini/insights/route.ts`
+  - `src/app/api/reports/export/route.ts`
+  - `src/app/onboarding/page.tsx`
+  - `.agent/progress.md`
+- Manual review needed:
+  - apply `20260520183129_phase_18_security_hardening_rls_review.sql` in hosted Supabase before expecting the tightened operational-table RLS and document-only proof bucket restrictions
+  - historical proof files already stored in the bucket are not removed by this phase; the restriction applies to future uploads after the migration is applied
+  - this phase did not rewrite presentation-oriented legacy admin placeholder screens, because the goal was security hardening only
+- Commands run:
+  - `Get-Content .agent/system-workflow.md`
+  - `Get-Content .agent/project-scaffold-reference.md`
+  - `Get-Content .agent/progress.md`
+  - `Get-Content .agent/setup-guide.md`
+  - `Get-Content .agent/manual-setup-checklist.md`
+  - `Get-Content AGENTS.md`
+  - inspected Next.js 16 route handler and proxy docs from `node_modules/next/dist/docs`
+  - inspected current auth, proxy, route handler, server action, and migration files
+  - `cmd /c npx supabase migration new phase_18_security_hardening_rls_review` failed in sandbox because the Supabase CLI attempted to write telemetry under `C:\Users\Administrator\.supabase`
+  - escalated `$env:SUPABASE_DISABLE_TELEMETRY='1'; cmd /c npx supabase migration new phase_18_security_hardening_rls_review` succeeded
+  - `cmd /c npm run lint`
+  - `cmd /c npm run typecheck`
+  - `cmd /c npm run build`
+- Verification result:
+  - lint passed
+  - typecheck passed
+  - build passed
+- Next recommended phase:
+  - PHASE 19 - Responsive QA, PWA Readiness, and Final Testing
 
 ## Phase 17 Reports, Audit Trail, and Export Basics Summary
 

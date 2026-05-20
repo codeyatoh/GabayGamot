@@ -2,16 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { registerBhw } from "@/app/signup/actions";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { MapLocationPicker } from "@/components/foundation/map-location-picker";
+import { SignupStepper } from "@/components/auth/signup-stepper";
 import { getCurrentProfile, isProfileComplete } from "@/lib/supabase/profiles";
 
 export default async function SignupPage({
@@ -38,132 +29,57 @@ export default async function SignupPage({
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] px-4 py-10 dark:bg-[#0F172A]">
-      <Card className="w-full max-w-2xl">
-        <CardHeader className="space-y-4">
-          <div className="flex items-center gap-3">
-            <span className="flex size-12 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#EFF6FF] dark:border-white/10 dark:bg-white/5">
+    <div className="min-h-screen bg-[#F8FAFC] px-4 py-10 dark:bg-[#0F172A]">
+      <div className="mx-auto w-full max-w-2xl">
+        {/* ── Header ── */}
+        <div className="mb-8 text-center">
+          <Link href="/" className="inline-flex flex-col items-center gap-3">
+            <span className="flex size-14 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#EFF6FF] shadow-sm dark:border-white/10 dark:bg-white/5">
               <Image
                 alt="GabayGamot logo"
-                className="size-7 object-contain"
-                height={28}
+                className="size-9 object-contain"
+                height={36}
                 src="/assets/images/gabay-gamot-logo-sm.png"
-                width={28}
+                width={36}
               />
             </span>
-            <div>
-              <CardTitle>BHW Registration</CardTitle>
-              <CardDescription>
-                Register as a barangay health worker. Your role is assigned
-                automatically and your account stays pending until review.
-              </CardDescription>
-            </div>
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#2563EB] dark:text-[#60A5FA]">
+              GabayGamot
+            </span>
+          </Link>
+
+          <h1 className="mt-4 text-2xl font-bold tracking-tight text-[#0F172A] dark:text-slate-50 sm:text-3xl">
+            BHW Registration
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-[#64748B] dark:text-slate-400">
+            Create your Barangay Health Worker account. Your role is assigned
+            automatically and your account must be approved by a Super Admin
+            before you can access the system.
+          </p>
+        </div>
+
+        {/* ── Server message banner ── */}
+        {message && (
+          <div className="mb-6 rounded-2xl border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-3 text-sm text-[#1D4ED8] dark:border-[#1D4ED8]/40 dark:bg-[#1D4ED8]/10 dark:text-[#BFDBFE]">
+            {message}
           </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {message ? (
-            <div className="rounded-2xl border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-3 text-sm text-[#1D4ED8] dark:border-[#1D4ED8]/40 dark:bg-[#1D4ED8]/10 dark:text-[#BFDBFE]">
-              {message}
-            </div>
-          ) : null}
+        )}
 
-          <form action={registerBhw} className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="email">
-                  Email
-                </label>
-                <input
-                  className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40"
-                  id="email"
-                  name="email"
-                  required
-                  type="email"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="password">
-                  Password
-                </label>
-                <input
-                  className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40"
-                  id="password"
-                  minLength={6}
-                  name="password"
-                  required
-                  type="password"
-                />
-              </div>
-            </div>
+        {/* ── Stepper form card ── */}
+        <div className="rounded-3xl border border-[#E2E8F0] bg-white px-6 py-8 shadow-sm dark:border-slate-700/60 dark:bg-[#101B2D] sm:px-10">
+          <SignupStepper />
+        </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="firstName">
-                  First Name
-                </label>
-                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="firstName" name="firstName" required type="text" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="lastName">
-                  Last Name
-                </label>
-                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="lastName" name="lastName" required type="text" />
-              </div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="middleName">
-                  Middle Name <span className="text-[#64748B] dark:text-slate-400">(optional)</span>
-                </label>
-                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="middleName" name="middleName" type="text" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="suffix">
-                  Suffix <span className="text-[#64748B] dark:text-slate-400">(optional)</span>
-                </label>
-                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="suffix" name="suffix" type="text" />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="contactNumber">
-                Contact Number
-              </label>
-              <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="contactNumber" name="contactNumber" required type="text" />
-            </div>
-
-            <MapLocationPicker />
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="proofDocument">
-                Proof Document
-              </label>
-              <input
-                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] file:mr-4 file:rounded-xl file:border-0 file:bg-[#2563EB] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#1D4ED8] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:file:bg-[#2563EB]"
-                id="proofDocument"
-                name="proofDocument"
-                required
-                type="file"
-              />
-              <p className="text-xs leading-6 text-[#64748B] dark:text-slate-400">
-                Upload one supporting file such as a valid ID, BHW accreditation,
-                or health center endorsement. PDF or Word document only, up to 5MB.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <Button className="w-full" type="submit">
-                Submit Registration
-              </Button>
-              <Button asChild className="w-full" variant="outline">
-                <Link href="/login">Back to Login</Link>
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+        <p className="mt-6 text-center text-sm text-[#64748B] dark:text-slate-400">
+          Already have an account?{" "}
+          <Link
+            className="font-medium text-[#2563EB] hover:text-[#1D4ED8] dark:text-[#60A5FA] dark:hover:text-[#93C5FD] transition-colors"
+            href="/login"
+          >
+            Log in here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

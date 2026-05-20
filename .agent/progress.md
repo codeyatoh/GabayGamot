@@ -4,6 +4,12 @@
 
 Late-phase maintenance alignment completed for `D:\Clients Project\Codex.GabayGamot`.
 
+Auth UI has been significantly improved:
+- Implemented a premium, responsive, split-layout Login Page featuring a branding/benefits sidebar and direct medical theme integration.
+- Designed and built a 6-step registration flow (`SignupStepper`) for new Barangay Health Workers (BHWs), ensuring robust step validation, controlled state preservation across steps, integrated the Mapbox location picker, and provided a comprehensive Review & Submit summary.
+- Preserved 100% of the existing Supabase server-side authentication actions, redirect logic, and backend security guards.
+- Ensured a fully passing Next.js production build (`npm run build`), ESLint validation (`npm run lint`), and TypeScript type checking (`npm run typecheck`).
+
 A focused public navbar and palette polish pass is also complete: the header now follows the approved landing page navigation labels, expands more openly at the top, becomes rounded and compact after scroll, keeps an icon-only theme toggle with animated mobile menu transitions, and uses readable light/dark colors for links, cards, and buttons.
 
 A focused public hero polish pass is also complete: the landing hero now uses a full-view centered shadcn-style layout while keeping the real GabayGamot consultation-first message, existing login/dashboard routes, readable healthcare colors, and a tech stack logo row.
@@ -34,6 +40,35 @@ A targeted UI implementation for the **Features Section**, **How It Works Sectio
 - [x] PHASE 17 - Reports, Audit Trail, and Export Basics
 - [x] PHASE 18 - Security Hardening and RLS Review
 - [x] PHASE 19 - Responsive QA, PWA Readiness, and Final Testing
+- [x] Auth UI Improvements
+
+## Auth UI Improvement Summary
+
+- **Status**: completed
+- **Scope completed**:
+  - Improved `src/app/login/page.tsx` with a responsive, premium split-layout. The left panel showcases the GabayGamot branding, mission statement, and core benefit pillars using a healthcare-inspired gradient. The right panel houses the clean credentials card.
+  - Developed a new clientside multi-step controller in `src/components/auth/signup-stepper.tsx` dividing the intake process into 6 sequential steps:
+    1. *Personal Information* (name, contact, credentials)
+    2. *Work Information* (designation, years of service)
+    3. *Health Center Details* (center name, full street address)
+    4. *Location* (embedded MapLocationPicker showing the Mapbox map and dropdowns)
+    5. *Verification Documents* (file uploads for primary and secondary IDs)
+    6. *Review & Submit* (fully compiled metadata review card and approval notice)
+  - Updated `src/app/signup/page.tsx` to keep original SSR profile and session logic while rendering the high-fidelity `<SignupStepper />` component.
+  - Avoided any unused dependencies or extra packages (no zod or react-hook-form) to comply with project constraints.
+  - Kept all original form inputs always present in the DOM (hidden via CSS) to guarantee seamless server action submission.
+- **Existing features preserved**:
+  - `login` and `registerBhw` Server Actions.
+  - Redirect policies on active/pending profiles.
+  - Mapbox Map layout and PSGC dropdowns in `MapLocationPicker`.
+- **Files changed**:
+  - `src/app/login/page.tsx`
+  - `src/app/signup/page.tsx`
+  - `src/components/auth/signup-stepper.tsx`
+- **Commands run**:
+  - `npm run lint` — PASSED with 0 errors / warnings
+  - `npm run typecheck` — PASSED with 0 errors / warnings
+  - `npm run build` — PASSED with 0 errors / warnings
 
 ## Phase 19 Responsive QA, PWA Readiness, and Final Testing Summary
 

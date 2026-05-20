@@ -37,6 +37,8 @@
   --font-sans: "Segoe UI", Inter, Arial, sans-serif;
   --font-mono: "Cascadia Code", Consolas, monospace;
   --animate-shine-border: shine-rotation 8s linear infinite;
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
 
   @keyframes shine-rotation {
     from {
@@ -45,6 +47,16 @@
     to {
       transform: rotate(360deg);
     }
+  }
+
+  @keyframes accordion-down {
+    from { height: 0; opacity: 0; }
+    to { height: var(--radix-accordion-content-height); opacity: 1; }
+  }
+
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); opacity: 1; }
+    to { height: 0; opacity: 0; }
   }
 }
 

@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile, ClipboardList, ScanBarcode, ArchiveRestore, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile, ClipboardList, ScanBarcode, ArchiveRestore, ChevronRight, HelpCircle, Pill, Users, Bot } from "lucide-react";
 import * as Lucide from "lucide-react";
 import { FaGithub, FaTwitter, FaDribbble } from "react-icons/fa";
 import {
@@ -21,6 +24,12 @@ import {
   CardContent,
   CardHeader,
 } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 
 const stackLogos = [
@@ -395,6 +404,10 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+
+        {/* ── FAQ SECTION ── */}
+        <FAQSection />
+
       </main>
     </div>
   );
@@ -524,3 +537,204 @@ const timelineData: TimelineEventData[] = [
     },
   },
 ];
+
+const faqCategories = [
+  {
+    category: "Getting Started",
+    icon: HelpCircle,
+    faqs: [
+      {
+        question: "What is GabayGamot?",
+        answer:
+          "GabayGamot is a consultation-first medicine management platform built for barangay health centers. It lets health workers log patient consultations, scan medicines with Gemini AI, track live inventory, dispense safely, and route referrals when stock runs out.",
+      },
+      {
+        question: "Who can use GabayGamot?",
+        answer:
+          "GabayGamot is designed for Barangay Health Workers (BHWs) and Super Admins. BHWs manage their local health center, while Super Admins oversee all barangays in the network.",
+      },
+      {
+        question: "How do I create an account?",
+        answer:
+          "Click 'Get Started' on the homepage and complete the BHW registration form. Upload your proof of employment and pin your health center on the map. A Super Admin will review and approve your account.",
+      },
+      {
+        question: "How long does account approval take?",
+        answer:
+          "Approval depends on your Super Admin. Once they review your submitted documents and health center location, you will receive access to the full dashboard.",
+      },
+    ],
+  },
+  {
+    category: "Medicine & Inventory",
+    icon: Pill,
+    faqs: [
+      {
+        question: "How does the AI medicine scanner work?",
+        answer:
+          "Point your camera at any medicine box and tap Scan. Gemini AI reads the label and automatically extracts the medicine name, dosage, quantity, and expiry date. You can review and confirm the details before saving to inventory.",
+      },
+      {
+        question: "What happens when stock runs low?",
+        answer:
+          "GabayGamot automatically flags low-stock and near-expiry medicines on your dashboard. You will see critical alerts listing every affected batch so you can act before a stockout happens.",
+      },
+      {
+        question: "Can I add medicines without scanning?",
+        answer:
+          "Yes. You can manually select any medicine from the master catalog and enter the quantity and expiry date directly without using the camera scanner.",
+      },
+      {
+        question: "What is the medicine master catalog?",
+        answer:
+          "The master catalog is a shared list of all medicines in the GabayGamot network. Any approved health worker can look up medicines from it, while only authorized staff can add new entries.",
+      },
+    ],
+  },
+  {
+    category: "Patients & Dispensing",
+    icon: Users,
+    faqs: [
+      {
+        question: "Why must I log a consultation before dispensing?",
+        answer:
+          "GabayGamot uses a consultation-first design. Every medicine dispense is tied to a logged patient consultation to ensure full clinical accountability and an accurate audit trail.",
+      },
+      {
+        question: "How do referrals work when medicine is out of stock?",
+        answer:
+          "When your health center runs out of a medicine, GabayGamot uses the Haversine algorithm to find the nearest partner barangay with available stock and creates a referral automatically.",
+      },
+      {
+        question: "Are patient records kept private?",
+        answer:
+          "Yes. Patient data is protected by Supabase Row Level Security (RLS). BHWs can only access records within their assigned health center. No patient personal information is ever sent to the AI.",
+      },
+      {
+        question: "Can I view past dispensing history?",
+        answer:
+          "Yes. All dispensing transactions are logged in the audit trail. You can view, filter, and export dispensing records from the Reports section.",
+      },
+    ],
+  },
+  {
+    category: "AI Insights & Security",
+    icon: Bot,
+    faqs: [
+      {
+        question: "What does the AI co-pilot actually do?",
+        answer:
+          "The AI co-pilot analyzes your consultation logs, inventory levels, and referral trends to surface actionable insights — such as emerging illness trends, predicted stockouts, and recommended next steps. It is decision support only, not medical advice.",
+      },
+      {
+        question: "Does the AI diagnose patients?",
+        answer:
+          "No. GabayGamot AI is strictly a decision support tool. It works with operational and inventory data, never patient-level clinical data, and never replaces a licensed healthcare professional.",
+      },
+      {
+        question: "How is my data kept secure?",
+        answer:
+          "All data is stored in Supabase with strict Row Level Security policies. Server-side Gemini and Supabase integrations keep API keys out of the browser. Reports and AI insight responses include no-store cache headers to prevent data leakage.",
+      },
+      {
+        question: "Can Super Admins see data from all barangays?",
+        answer:
+          "Yes. Super Admins have a global view across all health centers for inventory monitoring, referral tracking, and AI insights. BHWs are restricted to their own center only.",
+      },
+    ],
+  },
+];
+
+function FAQSection() {
+  const [activeCategory, setActiveCategory] = useState<string | null>(
+    faqCategories[0].category
+  );
+  const activeFaqs = faqCategories.find(
+    ({ category }) => category === activeCategory
+  )?.faqs;
+
+  return (
+    <section id="faqs" className="mx-auto max-w-7xl px-6 py-20 md:py-32">
+      <div className="text-center">
+        <h2 className="text-balance text-3xl font-bold tracking-tight text-[#0F172A] dark:text-slate-50 sm:text-4xl md:text-[2.75rem]">
+          Frequently Asked Questions
+        </h2>
+        <p className="mt-4 text-balance text-lg text-[#64748B] dark:text-slate-300 md:text-xl">
+          Find answers to common questions about GabayGamot features and operations.
+        </p>
+      </div>
+
+      <div className="mx-auto mt-12 max-w-4xl sm:mt-16">
+        {/* Mobile FAQs (Accordion per Category) */}
+        <div className="flex flex-col gap-8 sm:hidden">
+          {faqCategories.map(({ category, icon: Icon, faqs }) => {
+            const CurrentIcon = Icon;
+            return (
+              <div className="rounded-2xl border border-[#CBD5E1] p-5 dark:border-slate-800/80 bg-white/50 dark:bg-[#101b2d]/20" key={category}>
+                <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3 dark:border-slate-800/60">
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-[#EFF6FF] text-[#2563EB] dark:bg-[#172338] dark:text-[#93C5FD]">
+                    <CurrentIcon className="size-4.5" />
+                  </div>
+                  <span className="font-bold text-[#1E293B] dark:text-slate-100 text-base">{category}</span>
+                </div>
+                <FAQList faqs={faqs} />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop FAQs (Categorized Sidebar tabs + Active list Accordion) */}
+        <div className="hidden gap-8 sm:flex">
+          <div className="flex w-64 shrink-0 flex-col gap-2">
+            {faqCategories.map(({ category, icon: Icon }) => {
+              const CurrentIcon = Icon;
+              const isActive = activeCategory === category;
+              return (
+                <Button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  variant={isActive ? "default" : "ghost"}
+                  className={cn(
+                    "h-12 justify-start gap-3 rounded-xl px-4 font-semibold text-sm transition-all",
+                    isActive
+                      ? "bg-[#2563EB] text-white shadow-md dark:bg-[#3B82F6]"
+                      : "text-[#64748B] hover:text-[#1E293B] dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+                  )}
+                >
+                  <CurrentIcon className="size-5 shrink-0" />
+                  {category}
+                </Button>
+              );
+            })}
+          </div>
+
+          <div className="flex grow flex-col gap-4 rounded-2xl border border-[#CBD5E1] p-6 dark:border-slate-800/80 bg-white/50 dark:bg-[#101b2d]/20">
+            <FAQList faqs={activeFaqs ?? []} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FAQList({ faqs }: { faqs: typeof faqCategories[0]["faqs"] }) {
+  return (
+    <Accordion className="space-y-3" collapsible type="single">
+      {faqs?.map((faq, index) => (
+        <AccordionItem
+          className="rounded-xl border border-[#CBD5E1]/40 dark:border-slate-800/40 bg-[#EFF6FF]/40 dark:bg-[#172338]/30 px-5"
+          key={index}
+          value={faq.question}
+        >
+          <AccordionTrigger className="font-semibold text-base py-4 text-[#1E293B] hover:text-[#2563EB] dark:text-slate-100 dark:hover:text-[#60A5FA] hover:no-underline">
+            {faq.question}
+          </AccordionTrigger>
+          <AccordionContent className="text-sm leading-relaxed text-[#475569] dark:text-slate-350 pb-4 pt-1">
+            {faq.answer}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  );
+}
+

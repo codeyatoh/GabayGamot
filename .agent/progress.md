@@ -10,7 +10,7 @@ A focused public hero polish pass is also complete: the landing hero now uses a 
 
 PHASE 19 is now completed as an additive Responsive QA, PWA Readiness, and Final Testing pass. The implementation keeps the existing authentication, inventory, scanning, dispensing, referral, patient, consultation, AI insight, reporting, and audit flows intact while adding lightweight install metadata, improving small-screen protected navigation, and completing final verification checks.
 
-A targeted UI implementation for the **Features Section**, **How It Works Section**, **AI Command Insights Section**, and **Team Section** has been completed using customized shadcn/ui components. The Team Section uses a shadcn-style border-grid layout with all 7 real GabayGamot members (Pauleen Sabillo, Angelito Halmain, Joash Elizzer, Gabriel Carpio, Cedrick Tacan, Roman Jade Sol, Rai Beligolo), teal-colored role labels, grayscale-to-color photo hover effect, and `next/image` for optimized avatar loading. All changes fully respect the GabayGamot healthcare color palette (medical blue, cyan, teal) and keep all existing routing, links, logic, and dynamic state fully functional.
+A targeted UI implementation for the **Features Section**, **How It Works Section**, **AI Command Insights Section**, **Team Section**, and **FAQ Section** has been completed using customized shadcn/ui components. The FAQ Section uses a categorized sidebar filter on desktop, separate category accordions on mobile, and medical blue/teal colors for the accordions with real GabayGamot QA contents. All changes fully respect the GabayGamot healthcare color palette and keep all existing routing, links, logic, and dynamic state fully functional.
 
 ## Completed Phases
 

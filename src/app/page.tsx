@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile } from "lucide-react";
+import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile, ClipboardList, ScanBarcode, ArchiveRestore } from "lucide-react";
 import {
   SiNextdotjs,
   SiTypescript,
@@ -11,6 +11,11 @@ import {
 
 import { SiteHeader } from "@/components/foundation/site-header";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+} from "@/components/ui/card";
 
 
 const stackLogos = [
@@ -181,7 +186,85 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+
+        {/* ── HOW IT WORKS SECTION ── */}
+        <section id="how-it-works" className="bg-slate-50 py-16 dark:bg-transparent md:py-32">
+          <div className="mx-auto max-w-5xl px-6">
+            <div className="text-center">
+              <h2 className="text-balance text-3xl font-bold tracking-tight text-[#0F172A] dark:text-slate-50 sm:text-5xl lg:text-5xl">
+                How GabayGamot Works
+              </h2>
+              <p className="mt-4 text-lg text-[#64748B] dark:text-slate-300">
+                A simple, three-step process ensuring clinical accountability and accurate inventory.
+              </p>
+            </div>
+
+            <Card className="mx-auto mt-8 grid max-w-sm divide-y overflow-hidden border-[#CBD5E1] shadow-sm dark:border-slate-800 md:mt-16 md:max-w-full md:grid-cols-3 md:divide-x md:divide-y-0">
+              
+              <div className="group text-center">
+                <CardHeader className="pb-3">
+                  <CardDecorator>
+                    <ClipboardList className="size-6 text-[#2563EB] dark:text-[#60A5FA]" aria-hidden />
+                  </CardDecorator>
+                  <h3 className="mt-6 text-lg font-semibold text-[#1E293B] dark:text-slate-100">
+                    1. Log Consultation
+                  </h3>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-[0.95rem] text-[#64748B] dark:text-slate-400">
+                    Verify the patient&apos;s health record and securely log their consultation details before proceeding.
+                  </p>
+                </CardContent>
+              </div>
+
+              <div className="group text-center">
+                <CardHeader className="pb-3">
+                  <CardDecorator>
+                    <ScanBarcode className="size-6 text-[#06B6D4] dark:text-[#22D3EE]" aria-hidden />
+                  </CardDecorator>
+                  <h3 className="mt-6 text-lg font-semibold text-[#1E293B] dark:text-slate-100">
+                    2. Scan or Select
+                  </h3>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-[0.95rem] text-[#64748B] dark:text-slate-400">
+                    Use our AI camera to quickly scan medicine boxes or manually select from the live inventory.
+                  </p>
+                </CardContent>
+              </div>
+
+              <div className="group text-center">
+                <CardHeader className="pb-3">
+                  <CardDecorator>
+                    <ArchiveRestore className="size-6 text-[#14B8A6] dark:text-[#2DD4BF]" aria-hidden />
+                  </CardDecorator>
+                  <h3 className="mt-6 text-lg font-semibold text-[#1E293B] dark:text-slate-100">
+                    3. Dispense & Update
+                  </h3>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-[0.95rem] text-[#64748B] dark:text-slate-400">
+                    Finalize the transaction. The system instantly updates your stock levels and logs the history.
+                  </p>
+                </CardContent>
+              </div>
+
+            </Card>
+          </div>
+        </section>
       </main>
     </div>
   );
 }
+
+const CardDecorator = ({ children }: { children: React.ReactNode }) => (
+  <div className="relative mx-auto size-36 duration-200 [mask-image:radial-gradient(circle_at_center,black_40%,transparent_60%)] [--color-border:rgba(30,41,59,0.1)] group-hover:[--color-border:rgba(30,41,59,0.2)] dark:[--color-border:rgba(255,255,255,0.15)] dark:group-hover:[--color-border:rgba(255,255,255,0.25)]">
+    <div
+      aria-hidden
+      className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-[size:24px_24px]"
+    />
+    <div className="absolute inset-0 m-auto flex size-12 items-center justify-center border-l border-t border-[var(--color-border)] bg-white dark:bg-[#101B2D]">
+      {children}
+    </div>
+  </div>
+);

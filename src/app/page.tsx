@@ -3,9 +3,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile, ClipboardList, ScanBarcode, ArchiveRestore, ChevronRight, HelpCircle, Pill, Users, Bot, ArrowUp, Moon, Sun, Heart, Mail } from "lucide-react";
+import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile, ClipboardList, ScanBarcode, ArchiveRestore, ChevronRight, HelpCircle, Pill, Users, Bot, ArrowUp, Moon, Sun, Heart } from "lucide-react";
 import * as Lucide from "lucide-react";
-import { FaGithub, FaTwitter, FaDribbble, FaFacebook, FaInstagram, FaLinkedin, FaYoutube, FaWhatsapp } from "react-icons/fa";
+import { FaFacebook, FaGithub, FaInstagram, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import {
   SiNextdotjs,
   SiTypescript,
@@ -389,16 +389,10 @@ export default function HomePage() {
                 <p className="mt-1 text-center text-sm font-semibold text-[#0d9488] dark:text-[#2DD4BF]">
                   {member.role}
                 </p>
-                <div className="mt-5 flex items-center justify-center gap-4">
-                  <Link href="#" target="_blank" className="text-[#64748B] hover:text-[#2563EB] dark:text-slate-400 dark:hover:text-[#60A5FA] transition-colors">
-                    <FaTwitter className="h-4 w-4" />
-                  </Link>
-                  <Link href="#" target="_blank" className="text-[#64748B] hover:text-[#2563EB] dark:text-slate-400 dark:hover:text-[#60A5FA] transition-colors">
-                    <FaGithub className="h-4 w-4" />
-                  </Link>
-                  <Link href="#" target="_blank" className="text-[#64748B] hover:text-[#2563EB] dark:text-slate-400 dark:hover:text-[#60A5FA] transition-colors">
-                    <FaDribbble className="h-4 w-4" />
-                  </Link>
+                <div className="mt-5 flex items-center justify-center gap-2">
+                  <span className="rounded-full border border-[#CBD5E1] bg-white px-3 py-1 text-[11px] font-semibold text-[#64748B] dark:border-slate-700 dark:bg-[#101B2D] dark:text-slate-300">
+                    AI Hackathon Team
+                  </span>
                 </div>
               </div>
             ))}
@@ -794,11 +788,11 @@ const footerNavigation = {
           id: "legal",
           name: "Security & Legal",
           items: [
-            { name: "Privacy Policy", href: "#" },
-            { name: "Terms of Use", href: "#" },
-            { name: "Data Protection", href: "#" },
-            { name: "Security Auditing", href: "#" },
-            { name: "Email Support", href: "mailto:support@gabaygamot.gov.ph" },
+            { name: "Privacy and Security FAQ", href: "/#faqs" },
+            { name: "AI Safety Notes", href: "/#ai-command-insights" },
+            { name: "Project Repository", href: "https://github.com/codeyatoh/GabayGamot" },
+            { name: "Meet the Team", href: "/#team" },
+            { name: "Login Portal", href: "/login" },
           ],
         },
       ],
@@ -808,43 +802,28 @@ const footerNavigation = {
 
 const footerSocials = [
   {
-    label: "Email Support",
-    href: "mailto:support@gabaygamot.gov.ph",
-    Icon: Mail,
-  },
-  {
-    label: "Twitter/X",
-    href: "https://twitter.com/gabaygamot",
-    Icon: FaTwitter,
-  },
-  {
-    label: "Instagram",
-    href: "https://instagram.com/gabaygamot",
-    Icon: FaInstagram,
-  },
-  {
     label: "Facebook",
-    href: "https://facebook.com/gabaygamot",
+    href: "#",
     Icon: FaFacebook,
   },
   {
+    label: "Instagram",
+    href: "#",
+    Icon: FaInstagram,
+  },
+  {
+    label: "X",
+    href: "#",
+    Icon: FaXTwitter,
+  },
+  {
     label: "LinkedIn",
-    href: "https://linkedin.com/company/gabaygamot",
+    href: "#",
     Icon: FaLinkedin,
   },
   {
-    label: "WhatsApp Support",
-    href: "https://wa.me/gabaygamot",
-    Icon: FaWhatsapp,
-  },
-  {
-    label: "YouTube Channel",
-    href: "https://youtube.com/gabaygamot",
-    Icon: FaYoutube,
-  },
-  {
-    label: "GitHub Repository",
-    href: "https://github.com/codeyatoh/GabayGamot",
+    label: "GitHub",
+    href: "#",
     Icon: FaGithub,
   },
 ];
@@ -1016,5 +995,3 @@ function FooterTheme() {
     </div>
   );
 }
-
-

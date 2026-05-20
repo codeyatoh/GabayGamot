@@ -4,6 +4,14 @@
 
 Late-phase maintenance alignment completed for `D:\Clients Project\Codex.GabayGamot`.
 
+A follow-up continuation cleanup is now completed for the previously unfinished items:
+- replaced the Super Admin global inventory mock screen with real `medicine_batches` aggregation by health center
+- simplified the BHW signup intake to match the live backend contract by removing the unused manual full-address field and extra supporting document upload
+- kept and finalized the staged `MapLocationPicker` redesign instead of reverting it
+- replaced placeholder footer legal and social links with real in-app destinations and the live GitHub repository
+- adjusted the footer social icon row again to show the requested five social platforms with placeholder links: Facebook, Instagram, X, LinkedIn, and GitHub
+- upgraded the MapLocationPicker with searchable combo-style dropdowns for large PSGC datasets, cleaner map fitting behavior on selection/GPS, and hidden coordinate submission so latitude/longitude stay out of the visible UI
+
 Auth UI has been significantly improved:
 - Implemented a premium, responsive, split-layout Login Page featuring a branding/benefits sidebar and direct medical theme integration.
 - Designed and built a 6-step registration flow (`SignupStepper`) for new Barangay Health Workers (BHWs), ensuring robust step validation, controlled state preservation across steps, integrated the Mapbox location picker, and provided a comprehensive Review & Submit summary.
@@ -15,6 +23,48 @@ A focused public navbar and palette polish pass is also complete: the header now
 A focused public hero polish pass is also complete: the landing hero now uses a full-view centered shadcn-style layout while keeping the real GabayGamot consultation-first message, existing login/dashboard routes, readable healthcare colors, and a tech stack logo row.
 
 PHASE 19 is now completed as an additive Responsive QA, PWA Readiness, and Final Testing pass. The implementation keeps the existing authentication, inventory, scanning, dispensing, referral, patient, consultation, AI insight, reporting, and audit flows intact while adding lightweight install metadata, improving small-screen protected navigation, and completing final verification checks.
+
+## Continuation Cleanup Summary
+
+- Status: completed
+- Scope completed:
+  - replaced the mock data generator in `src/app/(protected)/admin/inventory/page.tsx` with live batch aggregation using `medicine_batches`, `health_centers`, and approved `profiles`
+  - computed real global totals for active units, low-stock batches, near-expiry batches, expired batches, and per-center last sync activity
+  - simplified `src/components/auth/signup-stepper.tsx` so the UI now matches the current server action behavior:
+    - kept separate first name and last name fields
+    - removed the unused manual full-address textarea
+    - removed the extra supporting document upload
+    - restricted visible proof-document guidance and file input types to PDF, DOC, and DOCX
+  - preserved and finalized the staged `src/components/foundation/map-location-picker.tsx` redesign instead of un-staging it
+  - replaced placeholder footer legal/social/demo links in `src/app/page.tsx` with real internal anchors and the actual GitHub repository
+  - removed placeholder social links from team cards so the landing page no longer points to `#`
+- Existing functions preserved:
+  - Supabase auth and approval workflow
+  - patient and consultation-first flow
+  - inventory batch creation and stock deduction
+  - Gemini scan and AI insights routes
+  - referral and reporting flows
+- Files changed:
+  - `src/app/(protected)/admin/inventory/page.tsx`
+  - `src/components/auth/signup-stepper.tsx`
+  - `src/app/page.tsx`
+  - `.agent/progress.md`
+- Manual review needed:
+  - if you want formal standalone Privacy Policy or Terms pages later, those routes still need dedicated content pages
+  - if you want per-member social links in the Team section, you still need to provide the real URLs
+  - the kept `MapLocationPicker` redesign is staged intentionally and should be committed with the rest of this cleanup
+- Commands run:
+  - inspected `src/lib/supabase/inventory.ts`
+  - inspected `src/app/(protected)/inventory/inventory-client.tsx`
+  - inspected `supabase/migrations/20260520142500_phase_9_medicine_inventory.sql`
+  - inspected `src/lib/supabase/profiles.ts`
+  - inspected `src/app/(protected)/admin/inventory/page.tsx`
+  - inspected `src/components/auth/signup-stepper.tsx`
+  - inspected `src/components/foundation/map-location-picker.tsx`
+  - inspected `src/app/page.tsx`
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run build`
 
 A targeted UI implementation for the **Features Section**, **How It Works Section**, **AI Command Insights Section**, **Team Section**, **FAQ Section**, and **Footer Section** has been completed using customized shadcn/ui components. The FAQ Section uses a categorized sidebar filter on desktop, separate category accordions on mobile, and medical blue/teal colors for the accordions with real GabayGamot QA contents. The Footer Section features a brand card with the GabayGamot logo and description, a categorised grid linking platform features and workspaces, a row of responsive glassmorphic social icons, and an interactive synchronized light/dark mode theme controller. All changes fully respect the GabayGamot healthcare color palette and keep all existing routing, links, logic, and dynamic state fully functional.
 

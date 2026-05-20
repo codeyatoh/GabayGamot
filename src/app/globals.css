@@ -121,3 +121,12 @@ select {
 .animate-shine-border {
   animation: shine-rotation var(--duration, 8s) linear infinite;
 }
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

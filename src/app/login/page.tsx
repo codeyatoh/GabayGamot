@@ -17,12 +17,13 @@ export default async function LoginPage({
     : params.message;
 
   return (
-    <section className="relative flex min-h-screen w-full flex-col items-center justify-between bg-slate-50 px-4 py-8 dark:bg-[#0F172A]">
+    <section className="relative flex min-h-screen w-full flex-col items-center justify-between bg-[#F8FAFC] px-4 py-8 dark:bg-[#0F172A]">
       {/* ── Background Grid Pattern ── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.08),transparent_42%),radial-gradient(circle_at_bottom,rgba(20,184,166,0.06),transparent_40%)] dark:bg-[radial-gradient(circle_at_top,rgba(96,165,250,0.08),transparent_42%),radial-gradient(circle_at_bottom,rgba(45,212,191,0.05),transparent_40%)]" />
         <div className="absolute inset-y-0 left-1/2 h-full w-[1200px] -translate-x-1/2">
           <svg
-            className="pointer-events-none absolute inset-0 [mask-image:linear-gradient(black,transparent),radial-gradient(black,transparent)] [mask-composite:intersect] text-slate-200 dark:text-slate-800/40"
+            className="pointer-events-none absolute inset-0 [mask-image:linear-gradient(black,transparent),radial-gradient(black,transparent)] [mask-composite:intersect] text-slate-300/80 dark:text-slate-700/70"
             width="100%"
             height="100%"
           >
@@ -178,4 +179,3 @@ export default async function LoginPage({
     </section>
   );
 }
-

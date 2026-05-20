@@ -105,10 +105,7 @@ export function SignupStepper() {
   const [yearsOfService, setYearsOfService] = useState("");
 
   const [healthCenterName, setHealthCenterName] = useState("");
-  const [fullAddress, setFullAddress] = useState("");
-
   const [proofDocumentName, setProofDocumentName] = useState<string | null>(null);
-  const [secondDocumentName, setSecondDocumentName] = useState<string | null>(null);
 
   // ── Validation per step ──────────────────────────────────────────────────
   const passwordChecks = [
@@ -130,7 +127,7 @@ export function SignupStepper() {
       if (!contactNumber.trim()) return "Contact number is required.";
     }
     if (step === 5) {
-      if (!proofDocumentName) return "Please upload a valid ID or BHW certificate.";
+      if (!proofDocumentName) return "Please upload a PDF or Word proof document.";
     }
     return null;
   }, [step, firstName, lastName, email, password, contactNumber, proofDocumentName]);
@@ -342,10 +339,8 @@ export function SignupStepper() {
               <label className={LABEL_CLS} htmlFor="healthCenterName">Health Center Name{OPT}</label>
               <input className={INPUT_CLS} id="healthCenterName" name="healthCenterName" placeholder="e.g. Barangay Health Center San Jose" type="text" value={healthCenterName} onChange={(e) => setHealthCenterName(e.target.value)} />
             </div>
-            <div className="space-y-2">
-              <label className={LABEL_CLS} htmlFor="fullAddress">Full Address{OPT}</label>
-              <textarea className={cn(INPUT_CLS, "resize-none")} id="fullAddress" name="fullAddress" placeholder="e.g. 123 Rizal Street, Barangay San Jose, Quezon City" rows={3} value={fullAddress} onChange={(e) => setFullAddress(e.target.value)} />
-              <p className="text-xs text-[#64748B] dark:text-slate-400">Province, municipality, and barangay will be set using the location picker on the next step.</p>
+            <div className="rounded-2xl border border-[#DBEAFE] bg-[#EFF6FF] px-4 py-3 text-xs leading-relaxed text-[#1D4ED8] dark:border-[#1D4ED8]/40 dark:bg-[#1D4ED8]/10 dark:text-[#BFDBFE]">
+              Use the next step to select the province, city or municipality, and barangay from the PSGC address list, then drop the map pin for the exact health center location.
             </div>
           </StepperContent>
 
@@ -359,18 +354,13 @@ export function SignupStepper() {
             <div className="rounded-2xl border border-[#FEF3C7] bg-[#FFFBEB] px-4 py-3 dark:border-[#F59E0B]/30 dark:bg-[#F59E0B]/10">
               <div className="flex items-start gap-2 text-sm text-[#92400E] dark:text-[#FCD34D]">
                 <Info className="mt-0.5 size-4 shrink-0" />
-                <p>Upload clear, readable documents. Accepted formats: PDF, JPG, PNG. Maximum 5 MB per file.</p>
+                <p>Upload one clear and readable proof document. Accepted formats: PDF, DOC, or DOCX. Maximum 5 MB.</p>
               </div>
             </div>
             <div className="space-y-2">
-              <label className={LABEL_CLS} htmlFor="proofDocument">Valid ID or BHW Certificate</label>
-              <input accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*" className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] file:mr-4 file:rounded-xl file:border-0 file:bg-[#2563EB] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#1D4ED8] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:file:bg-[#2563EB] cursor-pointer" id="proofDocument" name="proofDocument" required type="file" onChange={(e) => setProofDocumentName(e.target.files?.[0]?.name ?? null)} />
-              <p className="text-xs text-[#64748B] dark:text-slate-400">Upload a valid government-issued ID, BHW accreditation, or health center endorsement letter.</p>
-            </div>
-            <div className="space-y-2">
-              <label className={LABEL_CLS} htmlFor="secondDocument">Supporting Document{OPT}</label>
-              <input accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*" className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] file:mr-4 file:rounded-xl file:border-0 file:bg-[#64748B] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#475569] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:file:bg-[#475569] cursor-pointer" id="secondDocument" name="secondDocument" type="file" onChange={(e) => setSecondDocumentName(e.target.files?.[0]?.name ?? null)} />
-              <p className="text-xs text-[#64748B] dark:text-slate-400">You may upload one additional document to support your application.</p>
+              <label className={LABEL_CLS} htmlFor="proofDocument">Proof Document</label>
+              <input accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] file:mr-4 file:rounded-xl file:border-0 file:bg-[#2563EB] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#1D4ED8] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:file:bg-[#2563EB] cursor-pointer" id="proofDocument" name="proofDocument" required type="file" onChange={(e) => setProofDocumentName(e.target.files?.[0]?.name ?? null)} />
+              <p className="text-xs text-[#64748B] dark:text-slate-400">Upload your BHW accreditation, endorsement letter, or other official proof document.</p>
             </div>
           </StepperContent>
 
@@ -402,14 +392,13 @@ export function SignupStepper() {
                     section: "Health Center",
                     rows: [
                       { label: "Health Center Name", value: healthCenterName || "—" },
-                      { label: "Full Address", value: fullAddress || "—" },
+                      { label: "Address Source", value: "PSGC address picker and map pin" },
                     ],
                   },
                   {
                     section: "Documents",
                     rows: [
-                      { label: "Primary Document", value: proofDocumentName || "Not uploaded" },
-                      { label: "Supporting Document", value: secondDocumentName || "None" },
+                      { label: "Proof Document", value: proofDocumentName || "Not uploaded" },
                     ],
                   },
                 ].map(({ section, rows }) => (

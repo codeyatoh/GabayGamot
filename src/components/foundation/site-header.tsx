@@ -9,12 +9,11 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "#overview", label: "Overview" },
   { href: "#features", label: "Features" },
   { href: "#how-it-works", label: "How It Works" },
-  { href: "#ai-insights", label: "AI Insights" },
-  { href: "#team", label: "Team" },
-  { href: "#faq", label: "FAQ" },
+  { href: "#ai-command-insights", label: "AI Command Insights" },
+  { href: "#team", label: "Team Section" },
+  { href: "#faqs", label: "FAQs" },
 ];
 
 const THEME_STORAGE_KEY = "gabaygamot-theme";

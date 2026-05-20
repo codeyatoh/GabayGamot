@@ -266,7 +266,7 @@ export function ScanClient() {
               </div>
 
               {/* Bottom camera overlay */}
-              <div className="z-10 flex justify-center mt-auto">
+              <div className="z-10 flex flex-col sm:flex-row items-center justify-center gap-3 mt-auto">
                 <button
                   type="button"
                   onClick={captureFrame}
@@ -275,6 +275,17 @@ export function ScanClient() {
                   <Camera className="size-5" />
                   Capture & Scan Label
                 </button>
+                <label className="flex items-center gap-2 rounded-2xl bg-[#334155] hover:bg-[#475569] text-white px-5 py-3.5 font-bold cursor-pointer transition duration-200">
+                  <Upload className="size-5" />
+                  Upload Image
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </label>
               </div>
             </div>
           ) : hasCamera === false ? (

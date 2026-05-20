@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints } from "lucide-react";
+import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile } from "lucide-react";
 import {
   SiNextdotjs,
   SiTypescript,
@@ -11,13 +11,7 @@ import {
 
 import { SiteHeader } from "@/components/foundation/site-header";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 
 const stackLogos = [
   { name: "Next.js",    Icon: SiNextdotjs,    colorClass: "text-[#000000] dark:text-white" },
@@ -28,24 +22,42 @@ const stackLogos = [
   { name: "Vercel",     Icon: SiVercel,       colorClass: "text-[#000000] dark:text-white" },
 ];
 
-const overviewCards = [
+const features = [
   {
-    title: "Consultation-first design",
+    title: "Consultation-First Design",
     description:
-      "Every dispense action is gated behind a proper patient consultation log — no guesswork, full clinical accountability.",
+      "Every dispense action is securely gated behind a proper patient consultation log — ensuring full clinical accountability.",
     icon: Waypoints,
   },
   {
-    title: "AI-powered scanning",
+    title: "AI-Powered Scanning",
     description:
-      "Photograph any medicine box or prescription. Gemini AI extracts name, dosage, quantity, and expiry instantly.",
+      "Photograph any medicine box. Gemini AI instantly extracts the name, dosage, quantity, and expiry date to streamline inventory.",
     icon: Stethoscope,
   },
   {
-    title: "Geo-smart referrals",
+    title: "Geo-Smart Referrals",
     description:
-      "When stock runs out, the Haversine formula finds the nearest partner barangay with available supply — in seconds.",
+      "When stock runs out, our Haversine algorithm instantly finds the nearest partner barangay with available supply.",
     icon: ShieldCheck,
+  },
+  {
+    title: "Live Stock Monitoring",
+    description:
+      "Track inventory levels in real-time. Automated alerts help prevent stockouts and ensure essential medicines are always available.",
+    icon: Zap,
+  },
+  {
+    title: "Mobile-Optimized Access",
+    description:
+      "Designed specifically for health workers in the field. Fast, responsive, and easy to use on any smartphone or tablet.",
+    icon: MonitorSmartphone,
+  },
+  {
+    title: "Secure & Compliant Data",
+    description:
+      "Built on Supabase with strict Row Level Security (RLS) to protect patient records and health worker credentials.",
+    icon: Cable,
   },
 ];
 
@@ -128,20 +140,44 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── OVERVIEW placeholder — next sections built here ── */}
-        <section className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 pb-16 pt-16 sm:px-6 lg:px-8 lg:pb-24">
-          <div id="overview" className="grid gap-6 lg:grid-cols-3">
-            {overviewCards.map(({ title, description, icon: Icon }) => (
-              <Card key={title} className="transition-shadow duration-300 hover:shadow-md">
-                <CardHeader>
-                  <div className="flex size-12 items-center justify-center rounded-2xl bg-[#EFF6FF] text-[#2563EB] dark:bg-[#172338] dark:text-[#93C5FD]">
-                    <Icon className="size-5" />
+        {/* ── FEATURES SECTION ── */}
+        <section id="features" className="mx-auto flex w-full max-w-7xl flex-col px-4 py-24 sm:px-6 lg:px-8">
+          <h2 className="text-pretty text-center text-3xl font-bold tracking-tight text-[#0F172A] dark:text-slate-50 sm:text-[2.75rem]">
+            Intelligent features for health workers
+          </h2>
+          <p className="mt-4 text-center text-lg text-[#64748B] dark:text-slate-300 sm:text-2xl">
+            Spend less time on paperwork and more time caring for patients.
+          </p>
+
+          <div className="mt-16 grid grid-cols-1 bg-white dark:bg-[#101B2D] sm:grid-cols-2 lg:grid-cols-3">
+            <div className="-mr-px flex h-16 items-center border border-[#CBD5E1] px-6 font-semibold text-lg text-[#1E293B] dark:border-slate-700 dark:text-slate-100 sm:col-span-2 md:col-span-1">
+              <Smile className="mr-4 text-[#2563EB] dark:text-[#60A5FA]" /> Everything you need
+            </div>
+            <div className="-mr-px hidden h-16 border border-[#CBD5E1] bg-[repeating-linear-gradient(315deg,rgba(203,213,225,0.4)_0,rgba(203,213,225,0.4)_1px,transparent_0,transparent_50%)] bg-[length:10px_10px] bg-fixed dark:border-slate-700 dark:bg-[repeating-linear-gradient(315deg,rgba(51,65,85,0.4)_0,rgba(51,65,85,0.4)_1px,transparent_0,transparent_50%)] md:block lg:col-span-2" />
+            
+            {features.map((feature, index) => (
+              <div
+                className="-mt-px -mr-px border border-[#CBD5E1] px-6 pb-6 pt-8 dark:border-slate-700"
+                key={index}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2563EB] dark:bg-[#172338] dark:text-[#93C5FD]">
+                    <feature.icon className="size-5" />
                   </div>
-                  <CardTitle>{title}</CardTitle>
-                  <CardDescription>{description}</CardDescription>
-                </CardHeader>
-                <CardContent />
-              </Card>
+                  <h3 className="font-semibold text-lg tracking-tight text-[#1E293B] dark:text-slate-100">
+                    {feature.title}
+                  </h3>
+                </div>
+                <p className="mt-5 text-[0.95rem] leading-relaxed text-[#475569] dark:text-slate-300">
+                  {feature.description}
+                </p>
+
+                <Button asChild variant="ghost" className="mt-5 h-auto p-0 font-semibold text-[#2563EB] hover:bg-transparent hover:text-[#1D4ED8] dark:text-[#60A5FA] dark:hover:bg-transparent dark:hover:text-[#93C5FD]">
+                  <Link href="/dashboard">
+                    Learn more <ArrowUpRight className="ml-1.5 size-4" />
+                  </Link>
+                </Button>
+              </div>
             ))}
           </div>
         </section>

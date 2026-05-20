@@ -1,15 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif } from "next/font/google";
+
 import { getAppUrl } from "@/lib/env/public";
 
 import "./globals.css";
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["italic", "normal"],
-  variable: "--font-instrument",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(getAppUrl()),
@@ -46,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`h-full antialiased ${instrumentSerif.variable}`}>
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

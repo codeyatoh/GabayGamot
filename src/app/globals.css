@@ -86,7 +86,3 @@ textarea,
 select {
   font: inherit;
 }
-
-.instrument {
-  font-family: var(--font-instrument), Georgia, serif;
-}

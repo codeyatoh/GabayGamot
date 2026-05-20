@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
-import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile, ClipboardList, ScanBarcode, ArchiveRestore, ChevronRight, HelpCircle, Pill, Users, Bot } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile, ClipboardList, ScanBarcode, ArchiveRestore, ChevronRight, HelpCircle, Pill, Users, Bot, ArrowUp, Moon, Sun, Heart, Mail } from "lucide-react";
 import * as Lucide from "lucide-react";
-import { FaGithub, FaTwitter, FaDribbble } from "react-icons/fa";
+import { FaGithub, FaTwitter, FaDribbble, FaFacebook, FaInstagram, FaLinkedin, FaYoutube, FaWhatsapp } from "react-icons/fa";
 import {
   SiNextdotjs,
   SiTypescript,
@@ -409,6 +409,7 @@ export default function HomePage() {
         <FAQSection />
 
       </main>
+      <Footer />
     </div>
   );
 }
@@ -716,7 +717,6 @@ function FAQSection() {
     </section>
   );
 }
-
 function FAQList({ faqs }: { faqs: typeof faqCategories[0]["faqs"] }) {
   return (
     <Accordion className="space-y-3" collapsible type="single">
@@ -737,4 +737,284 @@ function FAQList({ faqs }: { faqs: typeof faqCategories[0]["faqs"] }) {
     </Accordion>
   );
 }
+const footerNavigation = {
+  categories: [
+    {
+      id: "platform",
+      name: "Platform",
+      sections: [
+        {
+          id: "features",
+          name: "Features",
+          items: [
+            { name: "Public Home", href: "/" },
+            { name: "Features List", href: "/#features" },
+            { name: "How It Works", href: "/#how-it-works" },
+            { name: "AI Insights", href: "/#ai-command-insights" },
+            { name: "Our Makers", href: "/#team" },
+            { name: "FAQs Section", href: "/#faqs" },
+          ],
+        },
+        {
+          id: "workspaces",
+          name: "Workspaces",
+          items: [
+            { name: "BHW Dashboard", href: "/dashboard" },
+            { name: "Camera Scan", href: "/scan" },
+            { name: "Local Stock", href: "/inventory" },
+            { name: "Dispense Log", href: "/dispense" },
+            { name: "Referrals Desk", href: "/referrals" },
+            { name: "AI Insights App", href: "/ai-insights" },
+          ],
+        },
+        {
+          id: "admin-flows",
+          name: "Super Admin",
+          items: [
+            { name: "Admin Panel", href: "/admin" },
+            { name: "Global Stock", href: "/admin/inventory" },
+            { name: "Global Referrals", href: "/admin/referrals" },
+            { name: "Global Insights", href: "/admin/insights" },
+            { name: "Global Reports", href: "/admin/reports" },
+            { name: "Local Reports", href: "/reports" },
+          ],
+        },
+        {
+          id: "intake",
+          name: "Account",
+          items: [
+            { name: "Login Portal", href: "/login" },
+            { name: "BHW Register", href: "/signup" },
+            { name: "Onboarding Flow", href: "/onboarding" },
+            { name: "Pending Desk", href: "/pending-approval" },
+            { name: "Sign Out", href: "/auth/signout" },
+          ],
+        },
+        {
+          id: "legal",
+          name: "Security & Legal",
+          items: [
+            { name: "Privacy Policy", href: "#" },
+            { name: "Terms of Use", href: "#" },
+            { name: "Data Protection", href: "#" },
+            { name: "Security Auditing", href: "#" },
+            { name: "Email Support", href: "mailto:support@gabaygamot.gov.ph" },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+const footerSocials = [
+  {
+    label: "Email Support",
+    href: "mailto:support@gabaygamot.gov.ph",
+    Icon: Mail,
+  },
+  {
+    label: "Twitter/X",
+    href: "https://twitter.com/gabaygamot",
+    Icon: FaTwitter,
+  },
+  {
+    label: "Instagram",
+    href: "https://instagram.com/gabaygamot",
+    Icon: FaInstagram,
+  },
+  {
+    label: "Facebook",
+    href: "https://facebook.com/gabaygamot",
+    Icon: FaFacebook,
+  },
+  {
+    label: "LinkedIn",
+    href: "https://linkedin.com/company/gabaygamot",
+    Icon: FaLinkedin,
+  },
+  {
+    label: "WhatsApp Support",
+    href: "https://wa.me/gabaygamot",
+    Icon: FaWhatsapp,
+  },
+  {
+    label: "YouTube Channel",
+    href: "https://youtube.com/gabaygamot",
+    Icon: FaYoutube,
+  },
+  {
+    label: "GitHub Repository",
+    href: "https://github.com/codeyatoh/GabayGamot",
+    Icon: FaGithub,
+  },
+];
+
+const UnderlineStyle = "hover:-translate-y-1 border border-dotted border-[#CBD5E1] dark:border-slate-800 rounded-xl p-2.5 transition-all duration-200 bg-white/40 dark:bg-[#101b2d]/25 hover:bg-[#EFF6FF] dark:hover:bg-[#172338] hover:border-[#2563EB]/50 dark:hover:border-[#3B82F6]/50";
+
+function Footer() {
+  return (
+    <footer className="mx-auto mt-20 flex h-full w-full flex-col items-center justify-center border-t border-[#E2E8F0]/80 dark:border-slate-800/60 bg-[#F8FAFC] dark:bg-[#08111F]">
+      <div className="relative mx-auto grid max-w-7xl items-center justify-center gap-6 p-10 pb-4 md:flex">
+        <Link href="/" className="flex shrink-0 justify-center">
+          <span className="flex size-14 items-center justify-center rounded-full border border-[#CBD5E1] bg-[#EFF6FF] shadow-sm dark:border-slate-500/40 dark:bg-[#172338]">
+            <Image
+              alt="GabayGamot logo"
+              className="size-9 object-contain"
+              height={36}
+              src="/assets/images/gabay-gamot-logo-sm.png"
+              width={36}
+            />
+          </span>
+        </Link>
+        <p className="text-slate-500 dark:text-slate-400 text-center text-xs leading-relaxed md:text-left max-w-5xl">
+          Welcome to GabayGamot, the intelligent consultation-first medicine logistics and co-pilot network for barangay health centers. 
+          We are passionate about transforming rural healthcare workflows, helping health workers save time on administrative inventory logs, 
+          preventing critical stockouts through AI-driven predictions, and enabling seamless geo-referrals. 
+          Our mission is to empower local health stations with clinical accountability, smart data transparency, and secure co-piloting tools.
+        </p>
+      </div>
+
+      <div className="mx-auto w-full max-w-7xl px-6 py-8">
+        <div className="border-b border-dotted border-slate-300 dark:border-slate-800"> </div>
+        <div className="py-8">
+          {footerNavigation.categories.map((category) => (
+            <div
+              key={category.name}
+              className="grid grid-cols-2 gap-8 leading-6 sm:grid-cols-3 md:flex md:justify-between"
+            >
+              {category.sections.map((section) => (
+                <div key={section.name} className="flex flex-col">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-3">
+                    {section.name}
+                  </h4>
+                  <ul
+                    role="list"
+                    className="flex flex-col space-y-2"
+                  >
+                    {section.items.map((item) => (
+                      <li key={item.name} className="flow-root">
+                        <Link
+                          href={item.href}
+                          className="text-sm text-slate-500 hover:text-[#2563EB] md:text-xs dark:text-slate-400 hover:dark:text-[#60A5FA] transition-colors"
+                        >
+                          {item.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="border-b border-dotted border-slate-300 dark:border-slate-800"> </div>
+      </div>
+
+      <div className="flex flex-col items-center justify-center gap-6 px-6 md:flex-row md:flex-wrap">
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          {footerSocials.map((social) => {
+            const CurrentIcon = social.Icon;
+            return (
+              <Link
+                key={social.label}
+                aria-label={social.label}
+                href={social.href}
+                rel="noreferrer"
+                target="_blank"
+                className={UnderlineStyle}
+              >
+                <CurrentIcon className="h-5 w-5 text-slate-500 hover:text-[#2563EB] dark:text-slate-400 dark:hover:text-[#60A5FA] transition-colors" />
+              </Link>
+            );
+          })}
+        </div>
+        <FooterTheme />
+      </div>
+
+      <div className="mx-auto mt-8 mb-10 flex flex-col justify-between text-center text-xs md:max-w-7xl">
+        <div className="flex flex-row items-center justify-center gap-1 text-slate-500 dark:text-slate-400">
+          <span> © </span>
+          <span>{new Date().getFullYear()}</span>
+          <span>GabayGamot. Made with</span>
+          <Heart className="mx-1 h-4 w-4 animate-pulse text-red-500" />
+          <span> by </span>
+          <span className="font-bold text-slate-700 dark:text-slate-200">
+            Pauleen, Angelito, Joash, Gabriel, Cedrick, Roman & Rai
+          </span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function handleScrollTop() {
+  window.scroll({
+    top: 0,
+    behavior: "smooth",
+  });
+}
+
+function FooterTheme() {
+  const [themeState, setThemeState] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains("dark");
+      setThemeState(isDark ? "dark" : "light");
+    };
+    checkTheme();
+    
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const changeTheme = (nextTheme: "light" | "dark") => {
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+    window.localStorage.setItem("gabaygamot-theme", nextTheme);
+    setThemeState(nextTheme);
+  };
+
+  return (
+    <div className="flex items-center justify-center">
+      <div className="flex items-center rounded-full border border-dotted border-[#CBD5E1] dark:border-slate-800 bg-white/60 dark:bg-[#101b2d]/30 px-3 py-1">
+        <button
+          onClick={() => changeTheme("light")}
+          className={cn(
+            "rounded-full p-2 transition-all cursor-pointer",
+            themeState === "light"
+              ? "bg-[#2563EB] text-white shadow-sm"
+              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+          )}
+          aria-label="Light theme"
+        >
+          <Sun className="h-4 w-4" />
+        </button>
+
+        <button 
+          type="button" 
+          onClick={handleScrollTop}
+          className="mx-3 rounded-full p-2 text-slate-500 hover:text-[#2563EB] dark:text-slate-400 dark:hover:text-[#60A5FA] transition-all hover:scale-110 cursor-pointer"
+          aria-label="Scroll to top"
+        >
+          <ArrowUp className="h-4 w-4" />
+        </button>
+
+        <button
+          onClick={() => changeTheme("dark")}
+          className={cn(
+            "rounded-full p-2 transition-all cursor-pointer",
+            themeState === "dark"
+              ? "bg-[#3B82F6] text-white shadow-sm"
+              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+          )}
+          aria-label="Dark theme"
+        >
+          <Moon className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 

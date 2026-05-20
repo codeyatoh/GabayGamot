@@ -114,7 +114,20 @@ export default async function OnboardingPage({
                 <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="suffix">
                   Suffix <span className="text-[#64748B] dark:text-slate-400">(optional)</span>
                 </label>
-                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" defaultValue={defaultNames.suffix} id="suffix" name="suffix" type="text" />
+                <select
+                  className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40"
+                  defaultValue={defaultNames.suffix}
+                  id="suffix"
+                  name="suffix"
+                >
+                  <option value="">None / Select Suffix</option>
+                  <option value="Jr.">Jr.</option>
+                  <option value="Sr.">Sr.</option>
+                  <option value="II">II</option>
+                  <option value="III">III</option>
+                  <option value="IV">IV</option>
+                  <option value="V">V</option>
+                </select>
               </div>
             </div>
 

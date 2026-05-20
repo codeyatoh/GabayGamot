@@ -4,6 +4,7 @@ import Link from "next/link";
 import { login } from "@/app/login/actions";
 import { Button } from "@/components/ui/button";
 import { GoogleButton } from "@/components/auth/google-button";
+import { PasswordInput } from "@/components/auth/password-input";
 
 export default async function LoginPage({
   searchParams,
@@ -128,14 +129,13 @@ export default async function LoginPage({
                   Forgot password?
                 </Link>
               </div>
-              <input
+              <PasswordInput
                 className="w-full rounded-xl border border-slate-200 bg-[#F8FAFC] px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40"
                 id="password"
                 minLength={6}
                 name="password"
                 placeholder="Password"
                 required
-                type="password"
               />
             </div>
 

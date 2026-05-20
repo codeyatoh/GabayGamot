@@ -19,6 +19,7 @@ import {
 import { MapLocationPicker } from "@/components/foundation/map-location-picker";
 import { registerBhw } from "@/app/signup/actions";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/auth/password-input";
 import {
   Stepper,
   StepperNav,
@@ -108,6 +109,13 @@ export function SignupStepper() {
   const [secondDocumentName, setSecondDocumentName] = useState<string | null>(null);
 
   // ── Validation per step ──────────────────────────────────────────────────
+  const passwordChecks = [
+    { label: "8+ characters", met: password.length >= 8 },
+    { label: "Number", met: /\d/.test(password) },
+    { label: "Capital letter", met: /[A-Z]/.test(password) },
+    { label: "Special character", met: /[^A-Za-z0-9]/.test(password) },
+  ];
+
 
   const validateCurrentStep = useCallback(() => {
     if (step === 1) {
@@ -267,7 +275,21 @@ export function SignupStepper() {
               </div>
               <div className="space-y-2">
                 <label className={LABEL_CLS} htmlFor="suffix">Suffix{OPT}</label>
-                <input className={INPUT_CLS} id="suffix" name="suffix" placeholder="e.g. Jr., III" type="text" value={suffix} onChange={(e) => setSuffix(e.target.value)} />
+                <select
+                  className={INPUT_CLS}
+                  id="suffix"
+                  name="suffix"
+                  value={suffix}
+                  onChange={(e) => setSuffix(e.target.value)}
+                >
+                  <option value="">None / Select Suffix</option>
+                  <option value="Jr.">Jr.</option>
+                  <option value="Sr.">Sr.</option>
+                  <option value="II">II</option>
+                  <option value="III">III</option>
+                  <option value="IV">IV</option>
+                  <option value="V">V</option>
+                </select>
               </div>
             </div>
             <div className="space-y-2">
@@ -277,7 +299,26 @@ export function SignupStepper() {
             </div>
             <div className="space-y-2">
               <label className={LABEL_CLS} htmlFor="password">Password</label>
-              <input className={INPUT_CLS} id="password" name="password" minLength={8} placeholder="At least 8 characters" required type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <PasswordInput
+                className={INPUT_CLS}
+                id="password"
+                name="password"
+                minLength={8}
+                placeholder="At least 8 characters"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
+                {passwordChecks.map((c) => (
+                  <span
+                    key={c.label}
+                    className={c.met ? "text-green-600 dark:text-green-400 font-medium" : "text-slate-400 dark:text-slate-500"}
+                  >
+                    {c.met ? "✓ " : "• "}{c.label}
+                  </span>
+                ))}
+              </div>
             </div>
             <div className="space-y-2">
               <label className={LABEL_CLS} htmlFor="contactNumber">Contact Number</label>

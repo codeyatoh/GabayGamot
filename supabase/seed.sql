@@ -1,0 +1,2 @@
+-- PHASE 3 intentionally does not seed real data.
+-- Add seed rows only when a later phase explicitly requires them.

@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GabayGamot
 
-## Getting Started
+GabayGamot is a Next.js App Router project for a barangay medicine coordination system. This repository is currently in the early setup phases, so the focus is on a stable app shell, environment preparation, and documentation before business logic is added.
 
-First, run the development server:
+## Current Foundation
+
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- shadcn-style UI foundation
+- Supabase folder, migration, and typed client foundation
+- Supabase auth foundation with login, signout, confirm routes, and BHW registration pages
+- Public routes:
+  - `/`
+  - `/login`
+  - `/signup`
+  - `/onboarding`
+  - `/pending-approval`
+- Auth routes:
+  - `/auth/confirm`
+  - `/auth/signout`
+- Protected placeholder routes:
+  - `/dashboard`
+  - `/scan`
+  - `/inventory`
+  - `/dispense`
+  - `/ai-insights`
+  - `/referrals`
+
+## Scripts
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run lint
+npm run typecheck
+npm run build
+npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Copy `.env.example` to `.env.local`.
+2. Fill in only the values you already have.
+3. Keep server-only secrets out of any `NEXT_PUBLIC_` variable.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Environment placeholders currently prepared:
 
-## Learn More
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `GEMINI_API_KEY`
+- `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`
+- `MAPBOX_SECRET_TOKEN`
+- `ADDRESS_API_BASE_URL`
+- `ADDRESS_API_KEY`
+- `SUPER_ADMIN_EMAIL`
+- `SUPER_ADMIN_TEMP_PASSWORD`
+- `SUPER_ADMIN_DISPLAY_NAME`
+- `NEXT_PUBLIC_ENABLE_DEMO_MODE`
 
-To learn more about Next.js, take a look at the following resources:
+## Rules For This Repo
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Use Next.js + TypeScript + Supabase as the source of truth.
+- Do not introduce Firebase, Firestore, Cloudinary, Express, Tesseract, or React Vite.
+- Do not start inventory, approval, Gemini, or Mapbox logic before their proper phases.
+- Keep landing and login routes stable while the foundation grows.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Workflow
 
-## Deploy on Vercel
+Before each phase, read:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `.agent/system-workflow.md`
+- `.agent/project-scaffold-reference.md`
+- `.agent/progress.md`
+- `.agent/setup-guide.md`
+- `.agent/manual-setup-checklist.md`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The current project status and next recommended phase are tracked in `.agent/progress.md`.
+
+## Supabase Foundation
+
+PHASE 3 adds the smallest safe Supabase foundation without starting feature logic:
+
+- `supabase/config.toml`
+- `supabase/migrations/`
+- `supabase/seed.sql`
+- `src/lib/supabase/client.ts`
+- `src/lib/supabase/server.ts`
+- `src/lib/supabase/admin.ts`
+- `src/types/database.ts`
+
+Useful local Supabase scripts:
+
+```bash
+npm run supabase:start
+npm run supabase:stop
+npm run supabase:status
+npm run supabase:db:reset
+npm run supabase:db:push
+```
+
+## Auth Foundation
+
+PHASE 4 adds the smallest authentication loop without starting approval or business features:
+
+- `/login` now supports email/password login
+- `/auth/confirm` verifies SSR email confirmation links
+- `/auth/signout` clears the Supabase session from the server
+- `src/proxy.ts` refreshes auth cookies and redirects unauthenticated users away from protected routes
+- protected routes now require a valid authenticated Supabase user
+
+## BHW Registration Foundation
+
+PHASE 5 extends the auth shell into the first real BHW intake flow without starting map behavior or approval decisions:
+
+- `/signup` collects the first BHW registration details
+- `/onboarding` lets already-authenticated accounts complete missing profile fields
+- `/pending-approval` holds incomplete or pending accounts outside the protected app
+- BHW accounts keep the default `bhw` role and `pending` approval status
+- proof documents upload into a private Supabase Storage bucket
+- protected routes now require:
+  - an authenticated user
+  - a complete BHW profile
+  - an `approved` profile status

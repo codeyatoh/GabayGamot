@@ -16,6 +16,8 @@ interface ExtractedMedicine {
   manufacturer: string;
   confidence_level: "high" | "medium" | "low";
   warnings: string[];
+  suggested_unit?: string;
+  pack_size_quantity?: number;
 }
 
 export function ScanClient() {
@@ -39,6 +41,10 @@ export function ScanClient() {
   
   const [manualQty, setManualQty] = useState("");
   const [manualUnit, setManualUnit] = useState("pcs");
+
+  // Keep track of original AI-detected quantity & unit for smart auto-filling & warning messages
+  const [aiQuantity, setAiQuantity] = useState<number | null>(null);
+  const [aiUnit, setAiUnit] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -187,6 +193,23 @@ export function ScanClient() {
       setConfidenceLevel(data.confidence_level || "medium");
       setWarnings(data.warnings || []);
       
+      // Handle smart auto-fill of quantity and unit
+      const detectedQty = data.pack_size_quantity || 0;
+      const detectedUnit = data.suggested_unit || "";
+
+      setAiQuantity(detectedQty > 0 ? detectedQty : null);
+      setAiUnit(detectedUnit || null);
+
+      if (detectedQty > 0) {
+        setManualQty(String(detectedQty));
+      } else {
+        setManualQty("");
+      }
+
+      if (detectedUnit) {
+        setManualUnit(detectedUnit);
+      }
+      
       setScanState("reviewed");
     } catch (err) {
       console.error(err);
@@ -237,6 +260,8 @@ export function ScanClient() {
     setScanState("idle");
     setManualQty("");
     setManualUnit("pcs");
+    setAiQuantity(null);
+    setAiUnit(null);
     setApiError(null);
   };
 
@@ -520,6 +545,42 @@ export function ScanClient() {
                   onChange={(e) => setManualQty(e.target.value)}
                   className="mt-2 w-full rounded-2xl border-2 border-[#2563EB] bg-white px-4 py-3 text-sm font-semibold text-[#1E293B] focus:outline-none dark:bg-[#1F2937] dark:text-slate-100"
                 />
+                {aiQuantity && (
+                  <div className="mt-1.5 flex items-center justify-between text-xs px-1">
+                    {parseInt(manualQty, 10) === aiQuantity && manualUnit === aiUnit ? (
+                      <span className="text-green-600 dark:text-green-400 font-semibold flex items-center gap-1">
+                        ✨ AI Auto-filled: {aiQuantity} {aiUnit}
+                      </span>
+                    ) : (
+                      <span className="text-amber-600 dark:text-amber-400 font-medium">
+                        Modified (AI suggested: {aiQuantity} {aiUnit})
+                      </span>
+                    )}
+                    {parseInt(manualQty, 10) !== aiQuantity && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setManualQty(String(aiQuantity));
+                          if (aiUnit) setManualUnit(aiUnit);
+                        }}
+                        className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold underline cursor-pointer"
+                      >
+                        Reset to {aiQuantity} {aiUnit}
+                      </button>
+                    )}
+                  </div>
+                )}
+                {/* Filipinized dynamic warning if they input too small a quantity */}
+                {manualQty && parseInt(manualQty, 10) > 0 && parseInt(manualQty, 10) <= 5 && ["tabs", "caps"].includes(manualUnit) && (
+                  <div className="mt-2.5 rounded-xl border border-amber-200 bg-amber-50/50 p-3 text-xs text-amber-800 dark:border-amber-900/30 dark:bg-[#78350F]/10 dark:text-amber-300 animate-pulse">
+                    <span className="font-bold">💡 Tip para sa Quantity:</span> Sigurado po ba kayong <strong>{manualQty} {manualUnit === "tabs" ? "tablet/s" : "capsule/s"}</strong> lang ito? Baka po kahon (box) ang hawak ninyo. Paki-ilagay po ang kabuuang piraso (e.g. 1 box ng 100s = <strong>100</strong>).
+                  </div>
+                )}
+                {manualQty && parseInt(manualQty, 10) > 0 && parseInt(manualQty, 10) <= 5 && manualUnit === "mL" && (
+                  <div className="mt-2.5 rounded-xl border border-amber-200 bg-amber-50/50 p-3 text-xs text-amber-800 dark:border-amber-900/30 dark:bg-[#78350F]/10 dark:text-amber-300 animate-pulse">
+                    <span className="font-bold">💡 Tip para sa Liquids:</span> Karaniwan po ang syrup/liquid ay nasa <strong>60 mL</strong> o <strong>120 mL</strong>. Kung 1 bote ito, pakitingnan sa label kung ilang mL at iyon po ang i-enter dito.
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-[#64748B] dark:text-slate-400">

@@ -73,6 +73,8 @@ export async function POST(req: NextRequest) {
           "Complete the full course of treatment as prescribed.",
           "Do not share this medicine with others.",
         ],
+        suggested_unit: "caps",
+        pack_size_quantity: 100,
       };
 
       return NextResponse.json(mockData);
@@ -88,20 +90,40 @@ export async function POST(req: NextRequest) {
       base64Data = matches[2];
     }
 
-    const prompt = `Analyze the medicine bottle/box label in the provided image. Extract details such as names, strength, dosage form, batch code, expiry date, manufacturer, and warnings. Make sure you translate or parse any dates into standard YYYY-MM-DD. Return exactly a JSON object matching this schema:
+    const prompt = `Analyze the medicine bottle/box label in the provided image. Extract details such as names, strength, dosage form, batch code, expiry date, manufacturer, and warnings. Make sure you translate or parse any dates into standard YYYY-MM-DD.
+
+Perform smart "what-if" mathematical deductions to extract or calculate package quantities:
+- What if the packaging specifies a box count or blister layout (e.g. "10 strips of 10 tablets" or "10 capsules per blister pack, 10 blisters per box")? Perform the multiplication (e.g., 10 * 10 = 100) and return the total individual units (100) in pack_size_quantity.
+- What if the packaging specifies the total count directly (e.g. "100 Tablets", "30 Capsules", "20 Sachets")? Extract the count (100, 30, 20) and return it in pack_size_quantity.
+- What if the medicine is a liquid (syrup/suspension/solution/elixir/drops, e.g. "60 mL" or "120 mL")? Extract the total volume in milliliters as a number (60, 120) and return it in pack_size_quantity.
+- What if the medicine is a cream, gel, or ointment (e.g. "15 g" or "5 g")? Extract the weight in grams as a number (15, 5) and return it in pack_size_quantity.
+- Otherwise, if no package size/quantity/volume is discernible, set pack_size_quantity to 0.
+
+Also determine the correct dispensing unit (suggested_unit) based on these rules:
+- Tablets -> "tabs"
+- Capsules -> "caps"
+- Liquid/Syrup/Suspension/Solution/Drops/Elixir -> "mL"
+- Cream/Ointment/Gel/Paste -> "g"
+- Sachets/Powders -> "sachets"
+- Vials/Ampules/Injections -> "vials"
+- General pieces/other -> "pcs"
+
+Return exactly a JSON object matching this schema:
 
 {
   "medicine_name": "generic name and brand name combined, or generic if no brand (string)",
   "generic_name": "standard generic name of the drug (string)",
   "brand_name": "brand name if present, otherwise empty string (string)",
   "strength": "strength, e.g. 500 mg, 10mg/5mL, etc. (string)",
-  "dosage_form": "dosage form, e.g. Tablet, Capsule, Syrup, Suspension, etc. (string)",
+  "dosage_form": "dosage form, e.g. Tablet, Capsule, Syrup, Cream, etc. (string)",
   "category": "category of drug, e.g. Antibiotic, Analgesic, Antipyretic, etc. (string)",
   "expiry_date": "expiry date in YYYY-MM-DD format if found, otherwise empty string (string)",
   "batch_number": "batch or lot number if found, otherwise empty string (string)",
   "manufacturer": "manufacturer name if found, otherwise empty string (string)",
   "confidence_level": "high" | "medium" | "low",
-  "warnings": ["list of warning strings or precautions related to this medicine"]
+  "warnings": ["list of warning strings or precautions related to this medicine"],
+  "suggested_unit": "tabs" | "caps" | "mL" | "vials" | "sachets" | "g" | "pcs",
+  "pack_size_quantity": 100 // calculated total base units or total volume/weight as a number, or 0 if not found
 }`;
 
     const payload: GeminiPayload = {

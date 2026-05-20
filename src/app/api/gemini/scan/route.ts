@@ -1,6 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGeminiApiKey } from "@/lib/env/server";
 
+// Ordered list of models to try — fastest/cheapest first, most capable last
+const GEMINI_MODEL_CHAIN = [
+  "gemini-flash-latest",
+  "gemini-2.0-flash",
+  "gemini-2.5-flash",
+  "gemini-2.0-flash-lite",
+];
+
+// Status codes that are worth retrying on the next model
+const RETRYABLE_STATUS_CODES = new Set([429, 503, 502, 500]);
+
+interface GeminiPayload {
+  contents: { parts: (Record<string, unknown>)[] }[];
+  generationConfig: Record<string, unknown>;
+}
+
+async function tryGeminiModel(
+  apiKey: string,
+  modelName: string,
+  payload: GeminiPayload
+): Promise<{ ok: boolean; status: number; data?: unknown; errorText?: string }> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return { ok: false, status: response.status, errorText };
+    }
+
+    const data = await response.json();
+    return { ok: true, status: response.status, data };
+  } catch (err) {
+    return { ok: false, status: 0, errorText: err instanceof Error ? err.message : "Network error" };
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { image } = await req.json();
@@ -11,11 +53,9 @@ export async function POST(req: NextRequest) {
 
     const apiKey = getGeminiApiKey();
 
-    // If Gemini API Key is missing, fall back to mock extraction for local testing & demos
+    // No API key — return rich mock data for local dev & demos
     if (!apiKey) {
       console.log("GEMINI_API_KEY is not set. Returning simulated medicine scan details.");
-      
-      // Simulate API network latency
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       const mockData = {
@@ -25,7 +65,7 @@ export async function POST(req: NextRequest) {
         strength: "500 mg",
         dosage_form: "Capsule",
         category: "Antibiotic",
-        expiry_date: new Date(Date.now() + 365 * 2 * 24 * 60 * 60 * 1000).toISOString().split("T")[0], // 2 years from now
+        expiry_date: new Date(Date.now() + 365 * 2 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
         batch_number: "AMX-" + Math.floor(100 + Math.random() * 900),
         manufacturer: "GlaxoSmithKline",
         confidence_level: "high",
@@ -38,8 +78,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(mockData);
     }
 
-    // Parse base64 parts
-    // Expecting data format: "data:image/jpeg;base64,..."
+    // Parse base64 data URL → mimeType + raw base64 string
     const matches = image.match(/^data:([^;]+);base64,(.*)$/);
     let mimeType = "image/jpeg";
     let base64Data = image;
@@ -56,7 +95,7 @@ export async function POST(req: NextRequest) {
   "generic_name": "standard generic name of the drug (string)",
   "brand_name": "brand name if present, otherwise empty string (string)",
   "strength": "strength, e.g. 500 mg, 10mg/5mL, etc. (string)",
-  "dosage_form": "dosage form, e.g. Tablet, Capsule, Syrup, Suspended, etc. (string)",
+  "dosage_form": "dosage form, e.g. Tablet, Capsule, Syrup, Suspension, etc. (string)",
   "category": "category of drug, e.g. Antibiotic, Analgesic, Antipyretic, etc. (string)",
   "expiry_date": "expiry date in YYYY-MM-DD format if found, otherwise empty string (string)",
   "batch_number": "batch or lot number if found, otherwise empty string (string)",
@@ -65,9 +104,7 @@ export async function POST(req: NextRequest) {
   "warnings": ["list of warning strings or precautions related to this medicine"]
 }`;
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
-
-    const payload = {
+    const payload: GeminiPayload = {
       contents: [
         {
           parts: [
@@ -86,28 +123,56 @@ export async function POST(req: NextRequest) {
       },
     };
 
-    const response = await fetch(geminiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    // Try each model in the fallback chain
+    let lastError = "";
+    for (const modelName of GEMINI_MODEL_CHAIN) {
+      console.log(`[Gemini Scan] Trying model: ${modelName}`);
+      const result = await tryGeminiModel(apiKey, modelName, payload);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+      if (result.ok && result.data) {
+        // Success — parse and return
+        const geminiResult = result.data as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+        const textResponse = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!textResponse) {
+          console.warn(`[Gemini Scan] ${modelName} returned empty response. Trying next model.`);
+          lastError = "Empty response from model";
+          continue;
+        }
+
+        try {
+          const parsedData = JSON.parse(textResponse.trim());
+          console.log(`[Gemini Scan] Success with model: ${modelName}`);
+          return NextResponse.json(parsedData);
+        } catch {
+          console.warn(`[Gemini Scan] ${modelName} returned unparseable JSON. Trying next model.`);
+          lastError = "Unparseable JSON from model";
+          continue;
+        }
+      }
+
+      // If retryable error (503, 429, 502, 500) — try next model
+      if (RETRYABLE_STATUS_CODES.has(result.status)) {
+        console.warn(`[Gemini Scan] ${modelName} returned ${result.status} (retryable). Trying next model.`);
+        lastError = `${modelName} returned ${result.status}: ${result.errorText?.slice(0, 120)}`;
+        continue;
+      }
+
+      // Non-retryable error (e.g. 400 bad request, 403 auth) — stop immediately
+      console.error(`[Gemini Scan] ${modelName} returned non-retryable ${result.status}. Stopping.`);
+      return NextResponse.json(
+        { error: `Failed to extract medicine details: ${result.errorText?.slice(0, 300)}` },
+        { status: result.status || 500 }
+      );
     }
 
-    const result = await response.json();
-    const textResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    // All models exhausted — return last known error
+    console.error("[Gemini Scan] All models in fallback chain failed:", lastError);
+    return NextResponse.json(
+      { error: `All Gemini models are currently unavailable. Please try again in a few seconds. (${lastError})` },
+      { status: 503 }
+    );
 
-    if (!textResponse) {
-      throw new Error("Empty response returned from Gemini API");
-    }
-
-    const parsedData = JSON.parse(textResponse.trim());
-    return NextResponse.json(parsedData);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Error in Gemini scan route handler:", error);

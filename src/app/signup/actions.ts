@@ -114,7 +114,7 @@ export async function registerBhw(formData: FormData) {
   if (!data.user) {
     redirect(
       signupMessagePath(
-        "This email address is already registered. Please try logging in or use a different email."
+        "Registration blocked by security rules. This usually happens if the email is already registered but unconfirmed. Please check your inbox for a previous confirmation link, or use a different email."
       )
     );
   }

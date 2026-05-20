@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
   "warnings": ["list of warning strings or precautions related to this medicine"]
 }`;
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
 
     const payload = {
       contents: [

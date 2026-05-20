@@ -1,6 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile, ClipboardList, ScanBarcode, ArchiveRestore, ChevronRight } from "lucide-react";
 import * as Lucide from "lucide-react";
+import { FaGithub, FaTwitter, FaDribbble } from "react-icons/fa";
 import {
   SiNextdotjs,
   SiTypescript,
@@ -66,6 +68,44 @@ const features = [
     description:
       "Built on Supabase with strict Row Level Security (RLS) to protect patient records and health worker credentials.",
     icon: Cable,
+  },
+];
+
+const teamMembers = [
+  {
+    name: "Pauleen Sabillo",
+    image: "https://mockmind-api.uifaces.co/content/human/97.jpg",
+    role: "Lead / Pitcher",
+  },
+  {
+    name: "Angelito Halmain",
+    image: "https://mockmind-api.uifaces.co/content/human/80.jpg",
+    role: "Full Stack Developer",
+  },
+  {
+    name: "Joash Elizzer",
+    image: "https://mockmind-api.uifaces.co/content/human/104.jpg",
+    role: "Data Analyst",
+  },
+  {
+    name: "Gabriel Carpio",
+    image: "https://mockmind-api.uifaces.co/content/human/112.jpg",
+    role: "Researcher",
+  },
+  {
+    name: "Cedrick Tacan",
+    image: "https://mockmind-api.uifaces.co/content/human/90.jpg",
+    role: "Tester",
+  },
+  {
+    name: "Roman Jade Sol",
+    image: "https://mockmind-api.uifaces.co/content/human/113.jpg",
+    role: "Coach",
+  },
+  {
+    name: "Rai Beligolo",
+    image: "https://mockmind-api.uifaces.co/content/human/111.jpg",
+    role: "Mentor",
   },
 ];
 
@@ -303,6 +343,50 @@ export default function HomePage() {
               </div>
             </div>
           </ShineBorder>
+        </section>
+
+        {/* ── TEAM SECTION ── */}
+        <section id="team" className="mx-auto max-w-7xl px-6 py-20 md:py-32">
+          <h2 className="text-balance text-center font-bold text-3xl tracking-tight text-[#0F172A] dark:text-slate-50 sm:text-4xl md:text-[2.75rem]">
+            Built by Makers
+          </h2>
+          <p className="mt-3 text-balance text-center text-lg text-[#64748B] dark:text-slate-300 tracking-tight md:text-xl">
+            The dedicated team driving clinical accountability and community healthcare co-piloting.
+          </p>
+
+          <div className="mt-12 grid grid-cols-1 sm:mt-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 border-l border-t border-[#CBD5E1] dark:border-slate-800/80">
+            {teamMembers.map((member, index) => (
+              <div className="-mt-px -ml-px border border-[#CBD5E1] dark:border-slate-800/80 py-8 px-4 flex flex-col items-center justify-center transition-all duration-200 hover:bg-slate-50/50 dark:hover:bg-slate-800/10" key={index}>
+                <div className="relative mx-auto aspect-square w-36 overflow-hidden rounded-full border border-[#CBD5E1] dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50">
+                  <Image
+                    alt={member.name}
+                    src={member.image}
+                    width={144}
+                    height={144}
+                    className="size-full object-cover object-center grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                    unoptimized
+                  />
+                </div>
+                <p className="mt-5 text-center font-bold text-lg text-[#1E293B] dark:text-slate-100">
+                  {member.name}
+                </p>
+                <p className="mt-1 text-center text-sm font-semibold text-[#0d9488] dark:text-[#2DD4BF]">
+                  {member.role}
+                </p>
+                <div className="mt-5 flex items-center justify-center gap-4">
+                  <Link href="#" target="_blank" className="text-[#64748B] hover:text-[#2563EB] dark:text-slate-400 dark:hover:text-[#60A5FA] transition-colors">
+                    <FaTwitter className="h-4 w-4" />
+                  </Link>
+                  <Link href="#" target="_blank" className="text-[#64748B] hover:text-[#2563EB] dark:text-slate-400 dark:hover:text-[#60A5FA] transition-colors">
+                    <FaGithub className="h-4 w-4" />
+                  </Link>
+                  <Link href="#" target="_blank" className="text-[#64748B] hover:text-[#2563EB] dark:text-slate-400 dark:hover:text-[#60A5FA] transition-colors">
+                    <FaDribbble className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       </main>
     </div>

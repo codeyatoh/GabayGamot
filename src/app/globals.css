@@ -96,3 +96,16 @@ textarea,
 select {
   font: inherit;
 }
+
+@keyframes shine-rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-shine-border {
+  animation: shine-rotation var(--duration, 8s) linear infinite;
+}

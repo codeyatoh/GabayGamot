@@ -31,20 +31,20 @@ export function ShineBorder({
         } as React.CSSProperties
       }
       className={cn(
-        "relative rounded-[var(--border-radius)] p-[var(--border-width)] overflow-hidden bg-slate-200/80 dark:bg-slate-800/80 shadow-md",
+        "relative rounded-[var(--border-radius)] p-[var(--border-width)] overflow-hidden bg-slate-100/50 dark:bg-slate-800/30 shadow-md",
         className
       )}
       {...props}
     >
       {/* Spinning glow background */}
       <div
-        className="absolute -inset-[150%] -z-10 animate-shine-border"
+        className="absolute -inset-[150%] z-0 animate-shine-border"
         style={{
           background: `conic-gradient(from 0deg, transparent 30%, ${colorString} 50%, transparent 70%)`,
         }}
       />
       {/* Content wrapper */}
-      <div className="relative w-full h-full bg-white dark:bg-[#101B2D] rounded-[calc(var(--border-radius)-var(--border-width))]">
+      <div className="relative z-10 w-full h-full bg-white dark:bg-[#101B2D] rounded-[calc(var(--border-radius)-var(--border-width))]">
         {children}
       </div>
     </div>

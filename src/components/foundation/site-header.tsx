@@ -71,8 +71,9 @@ export function SiteHeader() {
       <nav
         data-state={menuOpen ? "active" : "idle"}
         className={cn(
-          "fixed top-0 z-50 w-full px-3 transition-colors duration-300 md:px-4",
-          isScrolled ? "border-transparent" : "border-b border-[#CBD5E1]/80 dark:border-slate-600/40",
+          "fixed top-0 z-50 w-full px-3 transition-all duration-300 md:px-4",
+          "bg-[#F8FAFC]/90 backdrop-blur-lg dark:bg-[#08111F]/90",
+          isScrolled ? "border-transparent" : "border-b border-[#E2E8F0]/80 dark:border-slate-800/60",
         )}
       >
         <div
@@ -85,8 +86,8 @@ export function SiteHeader() {
             className={cn(
               "px-4 py-3 transition-all duration-300",
               isScrolled
-                ? "rounded-2xl border border-[#BFDBFE] bg-white/90 px-3 shadow-lg shadow-slate-200/50 backdrop-blur-xl dark:border-slate-500/35 dark:bg-[#101B2D]/90 dark:shadow-black/25"
-                : "rounded-none border-0 bg-transparent shadow-none backdrop-blur-0",
+                ? "rounded-2xl border border-[#BFDBFE] bg-white/95 px-3 shadow-lg shadow-slate-200/50 backdrop-blur-xl dark:border-slate-500/35 dark:bg-[#0D1826]/95 dark:shadow-black/25"
+                : "rounded-none border-0 bg-transparent shadow-none",
             )}
           >
             <div className="relative flex flex-wrap items-center justify-between gap-3">
@@ -106,7 +107,7 @@ export function SiteHeader() {
                       GabayGamot
                     </span>
                     <span className="block text-xs text-[#475569] dark:text-slate-300">
-                      Project foundation
+                      Barangay Portal
                     </span>
                   </span>
                 </Link>

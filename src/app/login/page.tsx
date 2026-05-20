@@ -15,18 +15,16 @@ export default async function LoginPage({
     : params.message;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 dark:bg-[#0F172A]">
-      {/* ── Back to home link (outside the card) ── */}
-      <div className="mb-3 w-full max-w-[400px]">
-        <Link
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 transition-colors"
-          href="/"
-        >
-          ← Back to home
-        </Link>
-      </div>
+    <div className="relative flex min-h-screen items-center justify-center bg-slate-50 px-4 dark:bg-[#0F172A]">
+      {/* ── Floating Back to home link (top-left of screen) ── */}
+      <Link
+        className="absolute top-6 left-6 md:top-8 md:left-8 inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 transition-colors"
+        href="/"
+      >
+        ← Back to home
+      </Link>
 
-      <div className="relative w-full max-w-[400px] overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#101B2D] px-8 py-10 shadow-xl dark:shadow-2xl">
+      <div className="relative w-full max-w-[420px] overflow-hidden rounded-3xl border border-[#E2E8F0] bg-white dark:border-slate-700/60 dark:bg-[#101B2D] px-6 py-8 sm:px-10 shadow-xl dark:shadow-2xl">
         {/* ── Patterned Grid Overlay ── */}
         <div
           className="absolute inset-0 -top-px -left-px z-0 pointer-events-none"
@@ -104,7 +102,7 @@ export default async function LoginPage({
           <form className="mt-6 w-full space-y-4">
             <div className="space-y-1.5">
               <label
-                className="text-xs font-semibold text-slate-700 dark:text-slate-200"
+                className="text-xs font-semibold text-[#1E293B] dark:text-slate-200"
                 htmlFor="email"
               >
                 Email address
@@ -122,13 +120,13 @@ export default async function LoginPage({
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label
-                  className="text-xs font-semibold text-slate-700 dark:text-slate-200"
+                  className="text-xs font-semibold text-[#1E293B] dark:text-slate-200"
                   htmlFor="password"
                 >
                   Password
                 </label>
                 <Link
-                  className="text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 underline"
+                  className="text-xs font-medium text-[#2563EB] hover:text-[#1D4ED8] dark:text-[#60A5FA] dark:hover:text-[#93C5FD] transition-colors hover:underline"
                   href="#"
                 >
                   Forgot your password?
@@ -155,15 +153,15 @@ export default async function LoginPage({
             </Button>
           </form>
 
-          {/* ── Sign up text link (no outline button, no OR divider) ── */}
+          {/* ── Sign up text link (consistent wording & style) ── */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-[#64748B] dark:text-slate-400">
               Don&apos;t have an account?{" "}
               <Link
-                className="font-semibold text-[#2563EB] hover:text-[#1D4ED8] dark:text-[#60A5FA] dark:hover:text-[#93C5FD] underline transition-colors"
+                className="font-medium text-[#2563EB] hover:text-[#1D4ED8] dark:text-[#60A5FA] dark:hover:text-[#93C5FD] transition-colors hover:underline"
                 href="/signup"
               >
-                Sign up
+                Sign up here
               </Link>
             </p>
           </div>

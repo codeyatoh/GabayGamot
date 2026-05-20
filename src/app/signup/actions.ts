@@ -105,11 +105,22 @@ export async function registerBhw(formData: FormData) {
     },
   });
 
+  console.log("Supabase signUp results - user:", data.user?.id, "error:", error?.message);
+
   if (error) {
     redirect(signupMessagePath(error.message));
   }
 
-  if (!data.user || !profileValidation.values || !proofDocument) {
+  if (!data.user) {
+    redirect(
+      signupMessagePath(
+        "This email address is already registered. Please try logging in or use a different email."
+      )
+    );
+  }
+
+  if (!profileValidation.values || !proofDocument) {
+    console.error("Signup validation mismatch: values=", !!profileValidation.values, "proof=", !!proofDocument);
     redirect(signupMessagePath("We could not finish your registration."));
   }
 

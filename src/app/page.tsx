@@ -939,7 +939,7 @@ function Footer() {
           <Heart className="mx-1 h-4 w-4 animate-pulse text-red-500" />
           <span> by </span>
           <span className="font-bold text-slate-700 dark:text-slate-200">
-            Pauleen, Angelito, Joash, Gabriel, Cedrick, Roman & Rai
+            Team Avant Heim
           </span>
         </div>
       </div>

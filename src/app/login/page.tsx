@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { login } from "@/app/login/actions";
 import { Button } from "@/components/ui/button";
+import { GoogleButton } from "@/components/auth/google-button";
 
 export default async function LoginPage({
   searchParams,
@@ -15,8 +16,38 @@ export default async function LoginPage({
     : params.message;
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-slate-50 px-4 dark:bg-[#0F172A]">
-      {/* ── Floating Back to home link (top-left of screen) ── */}
+    <section className="relative flex min-h-screen w-full flex-col items-center justify-between bg-slate-50 px-4 py-8 dark:bg-[#0F172A]">
+      {/* ── Background Grid Pattern ── */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute inset-y-0 left-1/2 h-full w-[1200px] -translate-x-1/2">
+          <svg
+            className="pointer-events-none absolute inset-0 [mask-image:linear-gradient(black,transparent),radial-gradient(black,transparent)] [mask-composite:intersect] text-slate-200 dark:text-slate-800/40"
+            width="100%"
+            height="100%"
+          >
+            <defs>
+              <pattern
+                id="grid-pattern"
+                x="-1"
+                y="-1"
+                width="60"
+                height="60"
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  d="M 60 0 L 0 0 0 60"
+                  fill="transparent"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                />
+              </pattern>
+            </defs>
+            <rect fill="url(#grid-pattern)" width="100%" height="100%" />
+          </svg>
+        </div>
+      </div>
+
+      {/* ── Floating Back to home link ── */}
       <Link
         className="absolute top-6 left-6 md:top-8 md:left-8 inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 transition-colors"
         href="/"
@@ -24,82 +55,47 @@ export default async function LoginPage({
         ← Back to home
       </Link>
 
-      <div className="relative w-full max-w-[420px] overflow-hidden rounded-3xl border border-[#E2E8F0] bg-white dark:border-slate-700/60 dark:bg-[#101B2D] px-6 py-8 sm:px-10 shadow-xl dark:shadow-2xl">
-        {/* ── Patterned Grid Overlay ── */}
-        <div
-          className="absolute inset-0 -top-px -left-px z-0 pointer-events-none"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, color-mix(in srgb, var(--card-foreground, #0f172a) 8%, transparent) 1px, transparent 1px),
-              linear-gradient(to bottom, color-mix(in srgb, var(--card-foreground, #0f172a) 8%, transparent) 1px, transparent 1px)
-            `,
-            backgroundSize: "20px 20px",
-            backgroundPosition: "0 0, 0 0",
-            maskImage: `
-              repeating-linear-gradient(
-                to right,
-                black 0px,
-                black 3px,
-                transparent 3px,
-                transparent 8px
-              ),
-              repeating-linear-gradient(
-                to bottom,
-                black 0px,
-                black 3px,
-                transparent 3px,
-                transparent 8px
-              ),
-              radial-gradient(ellipse 70% 50% at 50% 0%, #000 60%, transparent 100%)
-            `,
-            WebkitMaskImage: `
-              repeating-linear-gradient(
-                to right,
-                black 0px,
-                black 3px,
-                transparent 3px,
-                transparent 8px
-              ),
-              repeating-linear-gradient(
-                to bottom,
-                black 0px,
-                black 3px,
-                transparent 3px,
-                transparent 8px
-              ),
-              radial-gradient(ellipse 70% 50% at 50% 0%, #000 60%, transparent 100%)
-            `,
-            maskComposite: "intersect",
-            WebkitMaskComposite: "source-in",
-          }}
-        />
+      {/* ── Center Login Box ── */}
+      <div className="relative z-10 my-auto flex w-full max-w-[400px] flex-col items-center">
+        {/* ── GabayGamot Logo ── */}
+        <span className="flex size-14 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#EFF6FF] shadow-sm dark:border-white/10 dark:bg-white/5">
+          <Image
+            alt="GabayGamot logo"
+            className="size-9 object-contain"
+            height={36}
+            src="/assets/images/gabay-gamot-logo-sm.png"
+            width={36}
+          />
+        </span>
 
-        <div className="relative isolate flex flex-col items-center">
-          {/* ── GabayGamot Logo ── */}
-          <span className="flex size-14 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#EFF6FF] shadow-sm dark:border-white/10 dark:bg-white/5">
-            <Image
-              alt="GabayGamot logo"
-              className="size-9 object-contain"
-              height={36}
-              src="/assets/images/gabay-gamot-logo-sm.png"
-              width={36}
-            />
-          </span>
+        <h3 className="mt-5 text-center text-xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">
+          Log in to GabayGamot
+        </h3>
+        <p className="mt-1 text-center text-xs text-[#64748B] dark:text-slate-400 max-w-[280px]">
+          AI-assisted medicine management for barangay health centers
+        </p>
 
-          <p className="mt-4 font-bold text-xl text-slate-900 dark:text-slate-50 tracking-tight">
-            Log in to GabayGamot
-          </p>
-          <p className="mt-1 text-center text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-[280px]">
-            AI-assisted medicine management for barangay health centers
-          </p>
+        {message && (
+          <div className="mt-5 w-full rounded-xl border border-blue-200 bg-[#EFF6FF] px-4 py-3 text-xs font-medium text-blue-700 dark:border-blue-900/30 dark:bg-blue-900/15 dark:text-blue-300">
+            {message}
+          </div>
+        )}
 
-          {message && (
-            <div className="mt-5 w-full rounded-xl border border-blue-200 bg-[#EFF6FF] px-4 py-3 text-xs font-medium text-blue-700 dark:border-blue-900/30 dark:bg-blue-900/15 dark:text-blue-300">
-              {message}
-            </div>
-          )}
+        <div className="mt-8 w-full space-y-5">
+          {/* ── Primary: Google Login ── */}
+          <GoogleButton />
 
-          <form className="mt-6 w-full space-y-4">
+          {/* ── Divider ── */}
+          <div className="flex items-center justify-center gap-3">
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+              or
+            </span>
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+          </div>
+
+          {/* ── Secondary: Email + Password Form ── */}
+          <form className="space-y-4">
             <div className="space-y-1.5">
               <label
                 className="text-xs font-semibold text-[#1E293B] dark:text-slate-200"
@@ -129,7 +125,7 @@ export default async function LoginPage({
                   className="text-xs font-medium text-[#2563EB] hover:text-[#1D4ED8] dark:text-[#60A5FA] dark:hover:text-[#93C5FD] transition-colors hover:underline"
                   href="#"
                 >
-                  Forgot your password?
+                  Forgot password?
                 </Link>
               </div>
               <input
@@ -144,29 +140,42 @@ export default async function LoginPage({
             </div>
 
             <Button
-              className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl mt-2 font-semibold shadow-sm"
+              className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl font-semibold shadow-sm"
               formAction={login}
               size="lg"
               type="submit"
             >
-              Continue with Email
+              Log in with email
             </Button>
           </form>
-
-          {/* ── Sign up text link (consistent wording & style) ── */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-[#64748B] dark:text-slate-400">
-              Don&apos;t have an account?{" "}
-              <Link
-                className="font-medium text-[#2563EB] hover:text-[#1D4ED8] dark:text-[#60A5FA] dark:hover:text-[#93C5FD] transition-colors hover:underline"
-                href="/signup"
-              >
-                Sign up here
-              </Link>
-            </p>
-          </div>
         </div>
+
+        {/* ── Sign up Link ── */}
+        <p className="mt-6 text-center text-sm text-[#64748B] dark:text-slate-400">
+          New to GabayGamot?{" "}
+          <Link
+            className="font-semibold text-[#2563EB] hover:text-[#1D4ED8] dark:text-[#60A5FA] dark:hover:text-[#93C5FD] transition-colors hover:underline"
+            href="/signup"
+          >
+            Create a BHW account
+          </Link>
+        </p>
       </div>
-    </div>
+
+      {/* ── Footer / T&C ── */}
+      <div className="mt-8">
+        <p className="text-center text-xs text-[#64748B] dark:text-slate-400 leading-relaxed max-w-[280px]">
+          By continuing, you agree to GabayGamot&apos;s{" "}
+          <a href="#" className="font-semibold hover:underline">
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a href="#" className="font-semibold hover:underline">
+            Privacy Policy
+          </a>
+        </p>
+      </div>
+    </section>
   );
 }
+

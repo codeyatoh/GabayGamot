@@ -60,7 +60,15 @@ export default async function OnboardingPage({
     redirect("/pending-approval");
   }
 
-  const defaultNames = parseDisplayNameDefaults(profile?.display_name);
+  const googleFullName = user?.user_metadata?.full_name || user?.user_metadata?.name || "";
+  const defaultNames = parseDisplayNameDefaults(profile?.display_name || googleFullName);
+
+  if (!defaultNames.firstName && user?.user_metadata?.given_name) {
+    defaultNames.firstName = user.user_metadata.given_name;
+  }
+  if (!defaultNames.lastName && user?.user_metadata?.family_name) {
+    defaultNames.lastName = user.user_metadata.family_name;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F8FAFC] px-4 py-10 dark:bg-[#0F172A]">

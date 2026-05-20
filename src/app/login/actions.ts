@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { getAppUrl } from "@/lib/env/public";
 import { createClient } from "@/lib/supabase/server";
 import { seedSuperAdmin } from "@/lib/supabase/profiles";
 
@@ -38,4 +39,20 @@ export async function login(formData: FormData) {
 
   revalidatePath("/", "layout");
   redirect("/dashboard");
+}
+
+export async function signInWithGoogle() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${getAppUrl()}/auth/callback`,
+    },
+  });
+
+  if (error || !data.url) {
+    redirect(loginMessagePath("Google sign-in failed. Please try again."));
+  }
+
+  redirect(data.url);
 }

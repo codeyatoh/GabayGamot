@@ -20,6 +20,8 @@ import { MapLocationPicker } from "@/components/foundation/map-location-picker";
 import { registerBhw } from "@/app/signup/actions";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/auth/password-input";
+import { SuffixDropdown } from "@/components/auth/suffix-dropdown";
+import { ContactNumberInput } from "@/components/auth/contact-input";
 import {
   Stepper,
   StepperNav,
@@ -275,21 +277,10 @@ export function SignupStepper() {
               </div>
               <div className="space-y-2">
                 <label className={LABEL_CLS} htmlFor="suffix">Suffix{OPT}</label>
-                <select
-                  className={INPUT_CLS}
-                  id="suffix"
-                  name="suffix"
+                <SuffixDropdown
                   value={suffix}
-                  onChange={(e) => setSuffix(e.target.value)}
-                >
-                  <option value="">None / Select Suffix</option>
-                  <option value="Jr.">Jr.</option>
-                  <option value="Sr.">Sr.</option>
-                  <option value="II">II</option>
-                  <option value="III">III</option>
-                  <option value="IV">IV</option>
-                  <option value="V">V</option>
-                </select>
+                  onChange={setSuffix}
+                />
               </div>
             </div>
             <div className="space-y-2">
@@ -322,7 +313,10 @@ export function SignupStepper() {
             </div>
             <div className="space-y-2">
               <label className={LABEL_CLS} htmlFor="contactNumber">Contact Number</label>
-              <input className={INPUT_CLS} id="contactNumber" name="contactNumber" placeholder="e.g. 09123456789" required type="text" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} />
+              <ContactNumberInput
+                defaultValue={contactNumber}
+                onChange={setContactNumber}
+              />
             </div>
           </StepperContent>
 

@@ -71,40 +71,40 @@ const features = [
   },
 ];
 
-const teamMembers = [
+const teamMembers: { name: string; image: string | null; role: string }[] = [
   {
     name: "Pauleen Sabillo",
-    image: "https://mockmind-api.uifaces.co/content/human/97.jpg",
+    image: "/assets/images/team/pauleen-sabillo.jpg",
     role: "Lead / Pitcher",
   },
   {
     name: "Angelito Halmain",
-    image: "https://mockmind-api.uifaces.co/content/human/80.jpg",
+    image: "/assets/images/team/angelito-halmain.png",
     role: "Full Stack Developer",
   },
   {
     name: "Joash Elizzer",
-    image: "https://mockmind-api.uifaces.co/content/human/104.jpg",
+    image: "/assets/images/team/joash-elizzer.jpg",
     role: "Data Analyst",
   },
   {
     name: "Gabriel Carpio",
-    image: "https://mockmind-api.uifaces.co/content/human/112.jpg",
+    image: "/assets/images/team/gabriel-carpio.jpg",
     role: "Researcher",
   },
   {
     name: "Cedrick Tacan",
-    image: "https://mockmind-api.uifaces.co/content/human/90.jpg",
+    image: "/assets/images/team/cedrick-tacan.png",
     role: "Tester",
   },
   {
     name: "Roman Jade Sol",
-    image: "https://mockmind-api.uifaces.co/content/human/113.jpg",
+    image: null,
     role: "Coach",
   },
   {
     name: "Rai Beligolo",
-    image: "https://mockmind-api.uifaces.co/content/human/111.jpg",
+    image: null,
     role: "Mentor",
   },
 ];
@@ -358,14 +358,21 @@ export default function HomePage() {
             {teamMembers.map((member, index) => (
               <div className="-mt-px -ml-px border border-[#CBD5E1] dark:border-slate-800/80 py-8 px-4 flex flex-col items-center justify-center transition-all duration-200 hover:bg-slate-50/50 dark:hover:bg-slate-800/10" key={index}>
                 <div className="relative mx-auto aspect-square w-36 overflow-hidden rounded-full border border-[#CBD5E1] dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50">
-                  <Image
-                    alt={member.name}
-                    src={member.image}
-                    width={144}
-                    height={144}
-                    className="size-full object-cover object-center grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
-                    unoptimized
-                  />
+                  {member.image ? (
+                    <Image
+                      alt={member.name}
+                      src={member.image}
+                      width={144}
+                      height={144}
+                      className="size-full object-cover object-center grayscale contrast-[1.05] hover:grayscale-0 transition-all duration-300"
+                    />
+                  ) : (
+                    <div className="flex size-full items-center justify-center bg-gradient-to-br from-[#EFF6FF] to-[#DBEAFE] dark:from-[#172338] dark:to-[#1E3A5F]">
+                      <span className="text-3xl font-bold text-[#2563EB] dark:text-[#60A5FA] select-none">
+                        {member.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <p className="mt-5 text-center font-bold text-lg text-[#1E293B] dark:text-slate-100">
                   {member.name}

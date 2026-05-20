@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile, ClipboardList, ScanBarcode, ArchiveRestore } from "lucide-react";
+import { ArrowUpRight, ShieldCheck, Stethoscope, Waypoints, Zap, MonitorSmartphone, Cable, Smile, ClipboardList, ScanBarcode, ArchiveRestore, ChevronRight } from "lucide-react";
+import * as Lucide from "lucide-react";
 import {
   SiNextdotjs,
   SiTypescript,
@@ -11,6 +12,8 @@ import {
 
 import { SiteHeader } from "@/components/foundation/site-header";
 import { Button } from "@/components/ui/button";
+import { ShineBorder } from "@/components/ui/shine-border";
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -252,6 +255,55 @@ export default function HomePage() {
             </Card>
           </div>
         </section>
+
+        {/* ── AI COMMAND INSIGHTS SECTION ── */}
+        <section id="ai-command-insights" className="relative flex w-full flex-col items-center justify-center p-6 py-20 md:p-10 md:py-32">
+          {/* Subtle ambient light */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.06),transparent_60%)]" />
+
+          <ShineBorder
+            borderRadius={24}
+            borderWidth={2}
+            className="mx-auto w-full max-w-2xl"
+          >
+            <div className="p-6 sm:p-10 md:p-12 relative z-10 flex flex-col items-center">
+              <h2 className="mb-8 text-center text-3xl font-extrabold tracking-tight text-[#0F172A] dark:text-slate-50 md:text-4xl">
+                AI Command Insights
+              </h2>
+              
+              <Timeline />
+
+              <div className="z-10 mt-12 flex flex-col items-center text-center">
+                <h3 className="text-xl font-bold md:text-2xl text-[#1E293B] dark:text-slate-100">
+                  Intelligent Healthcare Co-Pilot
+                </h3>
+                <p className="mt-2 text-sm text-[#64748B] dark:text-slate-400 max-w-md">
+                  Decision support engine analyzing local disease trends and proximity logistics to ensure zero stockouts.
+                </p>
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-4">
+                  <Link
+                    href="/login"
+                    className={cn(
+                      "group inline-flex items-center justify-center rounded-xl bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-transform hover:scale-105 dark:bg-[#3B82F6]"
+                    )}
+                  >
+                    Get AI Insights
+                    <ChevronRight className="ml-1 size-4 transition-all duration-300 ease-out group-hover:translate-x-1" />
+                  </Link>
+                  <Link
+                    href="#features"
+                    className={cn(
+                      "group inline-flex items-center justify-center rounded-xl border border-[#CBD5E1] bg-white px-6 py-3 text-sm font-semibold text-[#1E293B] transition-transform hover:scale-105 dark:border-slate-700 dark:bg-[#172338] dark:text-slate-100"
+                    )}
+                  >
+                    Explore Features
+                    <ChevronRight className="ml-1 size-4 transition-all duration-300 ease-out group-hover:translate-x-1" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </ShineBorder>
+        </section>
       </main>
     </div>
   );
@@ -268,3 +320,116 @@ const CardDecorator = ({ children }: { children: React.ReactNode }) => (
     </div>
   </div>
 );
+
+// ── AI TIMELINE HELPERS ──
+
+interface TimelineEventProps {
+  label: string;
+  message: string;
+  icon: {
+    name: keyof typeof Lucide;
+    textColor: string;
+    borderColor: string;
+  };
+  isLast?: boolean;
+}
+
+const TimelineContainer = ({ children }: { children: React.ReactNode }) => (
+  <div className="mx-auto flex w-full max-w-lg flex-col justify-center gap-6">
+    {children}
+  </div>
+);
+
+const TimelineEvent = ({
+  label,
+  message,
+  icon,
+  isLast = false,
+}: TimelineEventProps) => {
+  const Icon = Lucide[icon.name as keyof typeof Lucide] as Lucide.LucideIcon;
+
+  return (
+    <div className="group/event relative flex gap-4 p-2 transition-all duration-200">
+      <div className="relative flex flex-col items-center">
+        <div
+          className={cn(
+            "bg-white dark:bg-[#101B2D] rounded-full border p-2 z-10 transition-transform duration-200 group-hover/event:scale-110 shadow-sm",
+            icon.borderColor
+          )}
+        >
+          {Icon && <Icon className={cn("size-4", icon.textColor)} />}
+        </div>
+        {!isLast && (
+          <div className="bg-[#CBD5E1]/60 dark:bg-slate-800/80 absolute top-9 bottom-[-24px] w-[2px] z-0" />
+        )}
+      </div>
+      <div className="flex flex-1 flex-col gap-1">
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-base font-semibold text-[#1E293B] dark:text-slate-100">{label}</p>
+        </div>
+        <p className="text-[#64748B] dark:text-slate-400 text-xs sm:text-sm leading-relaxed">{message}</p>
+      </div>
+    </div>
+  );
+};
+
+const Timeline = () => (
+  <TimelineContainer>
+    {timelineData.map((event, i) => (
+      <TimelineEvent
+        key={event.label}
+        isLast={i === timelineData.length - 1}
+        {...event}
+      />
+    ))}
+  </TimelineContainer>
+);
+
+interface TimelineEventData {
+  label: string;
+  message: string;
+  icon: {
+    name: keyof typeof Lucide;
+    textColor: string;
+    borderColor: string;
+  };
+}
+
+const timelineData: TimelineEventData[] = [
+  {
+    label: "Aggregate Inventory & Logs",
+    message: "The platform automatically consolidates daily consultation logs and batch stock levels from each health center.",
+    icon: {
+      name: "Database",
+      textColor: "text-[#2563EB]",
+      borderColor: "border-[#2563EB]/40",
+    },
+  },
+  {
+    label: "AI Pattern Extraction",
+    message: "Gemini Flash runs OCR on medicine labels and analyzes historical trends to detect impending stockouts or disease patterns.",
+    icon: {
+      name: "Sparkles",
+      textColor: "text-[#06B6D4]",
+      borderColor: "border-[#06B6D4]/40",
+    },
+  },
+  {
+    label: "Cross-Barangay Referrals",
+    message: "If supply runs low in your center, the co-pilot automatically flags nearby barangay stock options within geo-proximity.",
+    icon: {
+      name: "Waypoints",
+      textColor: "text-[#0D9488]",
+      borderColor: "border-[#0D9488]/40",
+    },
+  },
+  {
+    label: "Actionable Operational Alerts",
+    message: "Super Admins and health workers receive deep insights detailing what is happening, why it matters, and direct next steps.",
+    icon: {
+      name: "TrendingUp",
+      textColor: "text-[#10B981]",
+      borderColor: "border-[#10B981]/40",
+    },
+  },
+];

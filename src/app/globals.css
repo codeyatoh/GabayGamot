@@ -36,6 +36,16 @@
   --radius-3xl: calc(var(--radius) + 1.5rem);
   --font-sans: "Segoe UI", Inter, Arial, sans-serif;
   --font-mono: "Cascadia Code", Consolas, monospace;
+  --animate-shine-border: shine-rotation 8s linear infinite;
+
+  @keyframes shine-rotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }
 
 .dark {

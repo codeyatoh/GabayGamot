@@ -10,7 +10,7 @@ A focused public hero polish pass is also complete: the landing hero now uses a 
 
 PHASE 19 is now completed as an additive Responsive QA, PWA Readiness, and Final Testing pass. The implementation keeps the existing authentication, inventory, scanning, dispensing, referral, patient, consultation, AI insight, reporting, and audit flows intact while adding lightweight install metadata, improving small-screen protected navigation, and completing final verification checks.
 
-A targeted UI implementation for both the **Features Section** and **How It Works Section** has been completed using customized shadcn/ui components. The layouts include clean grids, subtle gradients, and elegant radial-masked border grids, fully respecting the GabayGamot healthcare color palette (medical blue, cyan, teal) and keeping all existing routing, links, logic, and dynamic state fully functional.
+A targeted UI implementation for the **Features Section**, **How It Works Section**, and **AI Command Insights Section** has been completed using customized shadcn/ui components. The layouts include clean grids, subtle gradients, radial-masked border grids, and an elegant **ShineBorder** conic gradient animated component containing a type-safe dynamic **Timeline** flow representing the co-pilot's steps. All changes fully respect the GabayGamot healthcare color palette (medical blue, cyan, teal) and keep all existing routing, links, logic, and dynamic state fully functional.
 
 ## Completed Phases
 

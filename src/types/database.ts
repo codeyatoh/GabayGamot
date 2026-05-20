@@ -113,6 +113,109 @@ export type Database = {
         };
         Relationships: [];
       };
+      medicine_master: {
+        Row: {
+          id: string;
+          generic_name: string;
+          brand_name: string | null;
+          strength: string;
+          dosage_form: string;
+          category: string | null;
+          description: string | null;
+          prescription_required: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          generic_name: string;
+          brand_name?: string | null;
+          strength: string;
+          dosage_form: string;
+          category?: string | null;
+          description?: string | null;
+          prescription_required?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          generic_name?: string;
+          brand_name?: string | null;
+          strength?: string;
+          dosage_form?: string;
+          category?: string | null;
+          description?: string | null;
+          prescription_required?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      medicine_batches: {
+        Row: {
+          id: string;
+          medicine_id: string;
+          health_center_id: string;
+          batch_number: string;
+          quantity: number;
+          unit: string;
+          expiry_date: string;
+          status: string;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          medicine_id: string;
+          health_center_id: string;
+          batch_number: string;
+          quantity?: number;
+          unit?: string;
+          expiry_date: string;
+          status?: string;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          medicine_id?: string;
+          health_center_id?: string;
+          batch_number?: string;
+          quantity?: number;
+          unit?: string;
+          expiry_date?: string;
+          status?: string;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "medicine_batches_medicine_id_fkey";
+            columns: ["medicine_id"];
+            isOneToOne: false;
+            referencedRelation: "medicine_master";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "medicine_batches_health_center_id_fkey";
+            columns: ["health_center_id"];
+            isOneToOne: false;
+            referencedRelation: "health_centers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "medicine_batches_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

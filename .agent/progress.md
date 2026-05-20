@@ -2,9 +2,9 @@
 
 ## Current Status
 
-PHASE 8 - Dashboard Layouts and Navigation completed for `D:\Clients Project\Codex.GabayGamot`.
+PHASE 9 - Medicine Master and Batch Inventory completed for `D:\Clients Project\Codex.GabayGamot`.
 
-The project now has complete, high-fidelity layouts and navigation flows for both BHWs and Super Admins. The central `ProtectedShell` has been updated to dynamically render role-specific navigation menus, highlighting the active path and matching our custom medical theme. A comprehensive suite of page components has been developed, including a BHW metrics dashboard, a simulated Camera Scan viewport and review form, an interactive local inventory browser with status filters, a step-by-step patient dispensing recorder, a cross-center referral transfer manager, and actionable AI insights advisor cards. Next.js App Router client/server component splitting has been enforced to prevent server-only module leaks. The build compile, typescript, and eslint checks pass successfully.
+The project now has the database schema and RLS policies defined for the central medicine catalog (`medicine_master`) and local center cabinet batches (`medicine_batches`). The TypeScript contracts inside `src/types/database.ts` have been extended to include type signatures for both tables. A robust backend actions repository (`src/lib/supabase/inventory.ts`) has been created to support searching the medicine directory, creating master entries, fetching local cabinet batches, and managing batch stock (upserting, incrementing, updating, and deleting batches). The build compile, typescript, and eslint checks pass successfully.
 
 ## Completed Phases
 
@@ -17,7 +17,7 @@ The project now has complete, high-fidelity layouts and navigation flows for bot
 - [x] PHASE 6 - Mapbox Location Picker and Address API
 - [x] PHASE 7 - Super Admin Approval Workflow
 - [x] PHASE 8 - Dashboard Layouts and Navigation
-- [ ] PHASE 9 - Medicine Master and Batch Inventory
+- [x] PHASE 9 - Medicine Master and Batch Inventory
 - [ ] PHASE 10 - Camera Scan and Gemini Extraction
 - [ ] PHASE 11 - Scan Review, Database Matching, and Manual Quantity
 - [ ] PHASE 12 - Inventory Monitoring and Alerts
@@ -99,6 +99,28 @@ The project now has complete, high-fidelity layouts and navigation flows for bot
   - no approval workflow
   - no inventory schema yet
 - no Mapbox or Gemini behavior
+
+## Phase 9 Summary
+
+- Status: completed
+- Scope:
+  - Formulated a secure database migration setting up the `medicine_master` and `medicine_batches` tables.
+  - Added primary key, check constraints, index structures, triggers, and foreign key relations.
+  - Enabled row level security (RLS) on both tables:
+    - Any authenticated user can read all master medicines. Only approved health workers/admins can create/modify master list entries.
+    - Any authenticated user can read batches (crucial for locating nearby stocks). Approved health workers/admins can only create, update, or delete inventory batches for their own health center.
+  - Extended the TypeScript database definitions file (`src/types/database.ts`) with type-sound signatures for rows, updates, insertion models, and relationships.
+  - Implemented the database actions library (`src/lib/supabase/inventory.ts`) supporting lookups, inserts, upserts, deletes, and quantity increments.
+- Files / Areas Created or Updated:
+  - `supabase/migrations/20260520142500_phase_9_medicine_inventory.sql`
+  - `src/types/database.ts`
+  - `src/lib/supabase/inventory.ts`
+- Errors Fixed:
+  - Resolved type checking issues by ensuring newly added entities match standard Supabase data conversions.
+- Manual Setup Needed:
+  - Run the SQL migration script `20260520142500_phase_9_medicine_inventory.sql` on the remote Supabase SQL Editor, or launch Docker and run `npm run supabase:db:reset` locally.
+- Recommended Next Phase:
+  - PHASE 10 - Camera Scan and Gemini Extraction
 
 ## Phase 8 Summary
 

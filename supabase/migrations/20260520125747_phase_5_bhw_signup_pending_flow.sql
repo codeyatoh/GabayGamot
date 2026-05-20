@@ -20,7 +20,4 @@ set
   file_size_limit = excluded.file_size_limit,
   allowed_mime_types = excluded.allowed_mime_types;
 
-comment on table storage.objects is
-  'Stores uploaded proof documents and other future storage metadata for GabayGamot.';
-
 commit;

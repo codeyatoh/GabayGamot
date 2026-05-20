@@ -2,9 +2,9 @@
 
 ## Current Status
 
-PHASE 10 - Camera Scan and Gemini Extraction completed for `D:\Clients Project\Codex.GabayGamot`.
+Late-phase maintenance alignment completed for `D:\Clients Project\Codex.GabayGamot`.
 
-Integrated live camera scanning utilizing HTML5 mediaDevices with automatic image/file upload fallback. Developed a secure server-side POST API route handler `/api/gemini/scan` that accepts a base64 encoded image and triggers a structured JSON schema extraction using Gemini Flash model. Created a secure Server Action (`src/app/(protected)/scan/actions.ts`) to lookup and insert catalog matches (`medicine_master`) and record center batches (`medicine_batches`). All build, lint, and typechecks pass successfully.
+PHASE 17 is now completed as an additive Reports, Audit Trail, and Export Basics layer. The implementation keeps the existing authentication, inventory, scanning, dispensing, referral, patient, consultation, and AI insight flows intact while adding protected operational report pages, authenticated CSV exports, and a lightweight audit trail table/helper.
 
 ## Completed Phases
 
@@ -19,15 +19,152 @@ Integrated live camera scanning utilizing HTML5 mediaDevices with automatic imag
 - [x] PHASE 8 - Dashboard Layouts and Navigation
 - [x] PHASE 9 - Medicine Master and Batch Inventory
 - [x] PHASE 10 - Camera Scan and Gemini Extraction
-- [ ] PHASE 11 - Scan Review, Database Matching, and Manual Quantity
-- [ ] PHASE 12 - Inventory Monitoring and Alerts
-- [ ] PHASE 13 - Dispensing Logs and Stock Deduction
-- [ ] PHASE 14 - Common Illness Logging
-- [ ] PHASE 15 - Nearby Barangay Medicine Referral
-- [ ] PHASE 16 - Actionable Gemini AI Insights
-- [ ] PHASE 17 - Reports, Audit Trail, and Export Basics
+- [x] PHASE 11 - Scan Review, Database Matching, and Manual Quantity
+- [x] PHASE 12 - Inventory Monitoring and Alerts
+- [x] PHASE 13 - Dispensing Logs and Stock Deduction
+- [x] PHASE 14 - Common Illness Logging
+- [x] PHASE 15 - Nearby Barangay Medicine Referral
+- [x] PHASE 16 - Actionable Gemini AI Insights
+- [x] PHASE 17 - Reports, Audit Trail, and Export Basics
 - [ ] PHASE 18 - Security Hardening and RLS Review
 - [ ] PHASE 19 - Responsive QA, PWA Readiness, and Final Testing
+
+## Phase 17 Reports, Audit Trail, and Export Basics Summary
+
+- Status: completed
+- Scope completed:
+  - added a protected BHW `/reports` route for local health center reports
+  - added a protected Super Admin `/admin/reports` route for global barangay reports
+  - added an authenticated CSV export route at `/api/reports/export`
+  - added export types for inventory, dispensing, referrals, consultations, and audit trail
+  - added a lightweight `audit_events` table migration with RLS
+  - added a non-blocking audit helper so existing workflows continue even if the audit migration has not yet been applied
+  - added audit writes to key server actions for patient creation, consultation recording, illness logging, inventory changes, scanned stock saves, dispensing, referrals, BHW approval/rejection, and report export
+- Data sources used:
+  - `medicine_batches`
+  - `medicine_master`
+  - `dispense_logs`
+  - `referrals`
+  - `consultations`
+  - `patients` by patient code only in reports/exports
+  - `health_centers`
+  - `audit_events` when available
+- Privacy and safety:
+  - reports and exports are protected by existing Supabase Auth checks
+  - BHW reports are scoped to the user's assigned health center
+  - Super Admin reports can use global scope
+  - exports avoid patient full names and use patient codes only
+  - no service role key is exposed to the frontend
+  - no destructive schema changes were made
+- Existing features preserved:
+  - authentication and approval workflow
+  - inventory scanning and matching
+  - stock deduction and dispensing
+  - patient and consultation flow
+  - referral creation, completion, and cancellation
+  - actionable Gemini AI insights
+- Files changed:
+  - `supabase/migrations/20260520180243_phase_17_reports_audit_exports.sql`
+  - `src/types/database.ts`
+  - `src/lib/supabase/audit.ts`
+  - `src/lib/reports/operational-reports.ts`
+  - `src/components/foundation/reports-dashboard.tsx`
+  - `src/app/(protected)/reports/page.tsx`
+  - `src/app/(protected)/admin/reports/page.tsx`
+  - `src/app/api/reports/export/route.ts`
+  - `src/components/foundation/sidebar-navigation.tsx`
+  - existing server action files touched only for non-blocking audit event writes
+  - `.agent/progress.md`
+  - `.agent/project-scaffold-reference.md`
+  - `.agent/setup-guide.md`
+  - `.agent/manual-setup-checklist.md`
+- Manual review needed:
+  - apply `20260520180243_phase_17_reports_audit_exports.sql` to hosted Supabase before expecting persisted audit events
+  - audit history before this phase is derived from existing operational records, not a complete historical audit table
+  - CSV export is intentionally basic for MVP; PDF or DOCX exports should be a later phase if needed
+  - full audit immutability/tamper-resistance should be reviewed in PHASE 18
+- Commands run:
+  - `cmd /c npx supabase migration new phase_17_reports_audit_exports` failed in sandbox because the Supabase CLI attempted to write telemetry under `C:\Users\Administrator\.supabase`
+  - `$env:SUPABASE_DISABLE_TELEMETRY='1'; cmd /c npx supabase migration new phase_17_reports_audit_exports` failed in sandbox for the same telemetry write
+  - escalated `$env:SUPABASE_DISABLE_TELEMETRY='1'; cmd /c npx supabase migration new phase_17_reports_audit_exports` succeeded
+  - `cmd /c npm run lint`
+  - `cmd /c npm run typecheck`
+  - `cmd /c npm run build`
+- Verification result:
+  - lint passed
+  - typecheck passed
+  - build passed
+  - browser smoke check confirmed `/reports` redirects unauthenticated users to `/login`
+- Next recommended phase:
+  - PHASE 18 - Security Hardening and RLS Review
+
+## Phase 16 Actionable Gemini AI Insights Summary
+
+- Status: completed
+- AI Insights definition update:
+  - insights now explain what is happening, why it may be happening, why it matters, possible operational impact, risk if no action is taken, and a practical recommended next step
+  - AI output is treated as decision support only, not diagnosis, prescription, or patient instruction
+- Deep insight structure implemented:
+  - `title`
+  - `severity`
+  - `insight_type`
+  - `observation`
+  - `why_it_matters`
+  - `root_cause_or_reason`
+  - `possible_impact`
+  - `risk`
+  - `recommended_action`
+  - `related_barangay`
+  - `related_medicine`
+  - `related_illness`
+  - `supporting_data_summary`
+  - `generated_at`
+- Top illness insight behavior:
+  - the AI summary identifies top illness categories per health center or across barangays
+  - illness trends are connected only to recorded medicine requests, dispensing movement, stock levels, referrals, or expiry data when the data supports the relationship
+  - if linked demand data is insufficient, the insight explains the gap instead of guessing
+- Data sources used:
+  - `consultations`
+  - `illness_logs`
+  - `consultation_medicine_requests`
+  - `dispense_logs`
+  - `medicine_batches`
+  - `medicine_master`
+  - `referrals`
+  - patient records are not sent to Gemini; only aggregate operational patterns are used
+- Existing functions preserved:
+  - authentication and approval workflow
+  - medicine inventory and stock deduction logic
+  - Gemini scan and label extraction route
+  - Mapbox referral discovery and referral fulfillment flow
+  - patient records and consultation-first patient flow
+  - existing table names, route names, and working modules
+- Files changed:
+  - `src/app/api/gemini/insights/route.ts`
+  - `src/app/(protected)/ai-insights/ai-insights-client.tsx`
+  - `src/app/(protected)/ai-insights/page.tsx`
+  - `src/app/(protected)/admin/insights/page.tsx`
+  - `src/types/ai-insights.ts`
+  - `.agent/progress.md`
+- Not changed to avoid breaking existing functions:
+  - no destructive schema changes were made
+  - no existing inventory, dispensing, referral, authentication, patient, or consultation logic was rewritten
+  - no frontend Gemini key exposure was introduced
+  - no AI diagnosis, prescribing, patient login, or patient-level insight display was added
+- Manual review needed:
+  - no local `ai_insights` table was detected, so generated insights are displayed on demand instead of persisted
+  - if persistent insight history is required later, add an `ai_insights` table and RLS policy in a separate reviewed migration
+  - hosted Supabase environments should confirm Phase 16 consultation tables are applied before relying on consultation-based demand insights
+- Commands run:
+  - `cmd /c npm run lint`
+  - `cmd /c npm run typecheck`
+  - `cmd /c npm run build`
+- Verification result:
+  - lint passed
+  - typecheck passed
+  - build passed
+- Next recommended phase:
+  - PHASE 17 - Reports, Audit Trail, and Export Basics
 
 ## Cleanup Summary
 
@@ -99,6 +236,83 @@ Integrated live camera scanning utilizing HTML5 mediaDevices with automatic imag
   - no approval workflow
   - no inventory schema yet
 - no Mapbox or Gemini behavior
+## Phase 14 Summary
+
+- Status: completed
+- Scope:
+  - Created `illness_logs` SQL migration with BHW-scoped Row Level Security to log patient visits that may or may not involve medicine dispensing (e.g. consultations or out-of-stock scenarios).
+  - Extended Supabase TypeScript typings in `src/types/database.ts` to include the new table.
+  - Implemented `logIllnessAction` server action to enforce secure validation and execute database inserts.
+  - Built a new `/illnesses` protected route with a sleek glassmorphic form for fast data entry (Patient Code, Illness Category, Action Taken, Notes).
+  - Displayed a recent cases feed directly alongside the form, eliminating the need to refresh the page.
+  - Upgraded `dashboard/page.tsx` to dynamically query and display the total number of consultations recorded in the barangay today.
+  - Updated `sidebar-navigation.tsx` to surface "Illness Cases" to BHWs and "Global Illnesses" to Super Admins using a Stethoscope icon.
+- Files / Areas Created or Updated:
+  - `supabase/migrations/20260521000000_phase_14_illness_logs.sql` [NEW]
+  - `src/types/database.ts`
+  - `src/app/(protected)/illnesses/actions.ts` [NEW]
+  - `src/app/(protected)/illnesses/page.tsx` [NEW]
+  - `src/app/(protected)/illnesses/illness-client.tsx` [NEW]
+  - `src/app/(protected)/dashboard/page.tsx`
+  - `src/components/foundation/sidebar-navigation.tsx`
+- Recommended Next Phase:
+  - PHASE 15 - Nearby Barangay Medicine Referral
+
+## Phase 13 Summary
+
+- Status: completed
+- Scope:
+  - Added new `dispense_logs` SQL migration (13) with full RLS for BHWs and Super Admins.
+  - Extended `src/types/database.ts` with the new table definitions.
+  - Created `dispenseStockAction` server action to handle atomic stock deduction and dispense logging, complete with over-dispense guard and optimistic locking.
+  - Upgraded `/dispense` to an async Server Component fetching live batches grouped by stock availability.
+  - Rewrote `DispenseClient` to use real props, calculating real-time expiry badges (Expired, Near Expiry), restricting dispensing above available quantities, and returning a detailed transaction receipt on success.
+- Files / Areas Created or Updated:
+  - `supabase/migrations/20260520180000_phase_13_dispense_logs.sql` [NEW]
+  - `src/types/database.ts`
+  - `src/app/(protected)/dispense/actions.ts` [NEW]
+  - `src/app/(protected)/dispense/page.tsx`
+  - `src/app/(protected)/dispense/dispense-client.tsx`
+- Recommended Next Phase:
+  - PHASE 14 - Common Illness Logging
+
+## Phase 12 Summary
+
+- Status: completed
+- Scope:
+  - Replaced mock inventory data in `inventory-client.tsx` with live `initialBatches` prop fetched from Supabase on the server.
+  - Implemented a dynamic status calculation engine: expired (expiry in past), near_expiry (≤180 days), out_of_stock (quantity = 0), low_stock (quantity ≤ 50), available (all else).
+  - Created `src/app/(protected)/inventory/actions.ts` with secure `updateInventoryBatchAction` and `deleteInventoryBatchAction` server actions, both enforcing BHW center-ownership and approval checks.
+  - Built a full-featured Edit Batch Modal (quantity, unit dropdown, expiry date) with Taglish tip banners.
+  - Built a Delete Batch Confirmation Modal with Taglish copy and hard-delete confirmation flow.
+  - Updated `src/app/(protected)/dashboard/page.tsx` to aggregate real metrics (total units, low stock count, near-expiry+expired count) and display a scrollable glassmorphic Critical Alerts Banner listing every flagged batch with days remaining or expired labels.
+- Files / Areas Created or Updated:
+  - `src/app/(protected)/inventory/actions.ts` [NEW]
+  - `src/app/(protected)/inventory/inventory-client.tsx`
+  - `src/app/(protected)/inventory/page.tsx`
+  - `src/app/(protected)/dashboard/page.tsx`
+- Errors Fixed:
+  - Replaced `any[]` types with precise `MedicineBatchWithDetails[]` in both server pages.
+  - Changed `catch (error: any)` to `catch (error: unknown)` with safe instanceof guards in actions.
+  - Removed unused `useTransition` hook from client component to clear lint warnings.
+- Recommended Next Phase:
+  - PHASE 13 - Dispensing Logs and Stock Deduction
+
+## Phase 11 Summary
+
+- Status: completed
+- Scope:
+  - Designed local center-specific query systems inside `src/app/(protected)/scan/actions.ts` to categorize scanned medicine into new master catalog entry, new inventory batch of existing medicine, or existing batch increment.
+  - Built an animated debounced matching UI inside `src/app/(protected)/scan/scan-client.tsx` using glassmorphism styling to visually guide BHWs based on their current inventory state.
+  - Safeguarded inventory database integrity by implementing an expiry date collision check that disables saving and warns users in Taglish if the expiry date differs from an existing batch (Rule 8).
+  - Programmed live formula display (`Current + New = Total`) so users see instant mathematical inventory updates.
+- Files / Areas Created or Updated:
+  - `src/app/(protected)/scan/actions.ts`
+  - `src/app/(protected)/scan/scan-client.tsx`
+- Errors Fixed:
+  - Offloaded React state changes from direct render pathways into microtask queues to avoid cascading render warnings and satisfy strict hooks linting.
+- Recommended Next Phase:
+  - PHASE 12 - Inventory Monitoring and Alerts
 
 ## Phase 10 Summary
 

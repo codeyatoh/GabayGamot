@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Camera, Bolt, Sparkles, Loader2, CheckCircle2, Upload, AlertTriangle } from "lucide-react";
-import { saveScannedMedicineAction } from "./actions";
+import { Camera, Bolt, Sparkles, Loader2, CheckCircle2, Upload, AlertTriangle, Layers } from "lucide-react";
+import { saveScannedMedicineAction, checkDatabaseMatchAction } from "./actions";
+import type { Database } from "@/types/database";
+
+type MedicineMasterRow = Database["public"]["Tables"]["medicine_master"]["Row"];
+type MedicineBatchRow = Database["public"]["Tables"]["medicine_batches"]["Row"];
 
 interface ExtractedMedicine {
   medicine_name: string;
@@ -46,6 +50,20 @@ export function ScanClient() {
   const [aiQuantity, setAiQuantity] = useState<number | null>(null);
   const [aiUnit, setAiUnit] = useState<string | null>(null);
 
+  // Live Database Matching State
+  const [matchResult, setMatchResult] = useState<{
+    matchType: "new_medicine" | "existing_medicine_new_batch" | "existing_batch" | "error" | null;
+    medicine: MedicineMasterRow | null;
+    matchingBatch: MedicineBatchRow | null;
+    existingBatches: MedicineBatchRow[];
+  }>({
+    matchType: null,
+    medicine: null,
+    matchingBatch: null,
+    existingBatches: [],
+  });
+  const [isCheckingMatch, setIsCheckingMatch] = useState(false);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -54,10 +72,11 @@ export function ScanClient() {
   useEffect(() => {
     if (!dosageForm) return;
     const form = dosageForm.toLowerCase().trim();
+    let suggestedUnit = "pcs";
     if (form.includes("tablet")) {
-      setManualUnit("tabs");
+      suggestedUnit = "tabs";
     } else if (form.includes("capsule")) {
-      setManualUnit("caps");
+      suggestedUnit = "caps";
     } else if (
       form.includes("syrup") ||
       form.includes("suspension") ||
@@ -65,21 +84,73 @@ export function ScanClient() {
       form.includes("drops") ||
       form.includes("elixir")
     ) {
-      setManualUnit("mL");
+      suggestedUnit = "mL";
     } else if (form.includes("sachet")) {
-      setManualUnit("sachets");
+      suggestedUnit = "sachets";
     } else if (
       form.includes("cream") ||
       form.includes("ointment") ||
       form.includes("gel")
     ) {
-      setManualUnit("g");
+      suggestedUnit = "g";
     } else if (form.includes("vial") || form.includes("ampule") || form.includes("injection")) {
-      setManualUnit("vials");
-    } else {
-      setManualUnit("pcs");
+      suggestedUnit = "vials";
     }
+
+    Promise.resolve().then(() => {
+      setManualUnit(suggestedUnit);
+    });
   }, [dosageForm]);
+
+  // Helper to trigger database matching check
+  const triggerDatabaseMatch = async (
+    gName: string,
+    bName: string,
+    str: string,
+    dForm: string,
+    bNum: string
+  ) => {
+    if (!gName || !str || !dForm || !bNum) {
+      return;
+    }
+
+    setIsCheckingMatch(true);
+    try {
+      const res = await checkDatabaseMatchAction({
+        genericName: gName,
+        brandName: bName || null,
+        strength: str,
+        dosageForm: dForm,
+        batchNumber: bNum,
+      });
+
+      if (res.success) {
+        setMatchResult({
+          matchType: res.matchType || "error",
+          medicine: res.medicine || null,
+          matchingBatch: res.matchingBatch || null,
+          existingBatches: res.existingBatches || [],
+        });
+      } else {
+        console.warn("Match query failed:", res.error);
+      }
+    } catch (err) {
+      console.error("Match error:", err);
+    } finally {
+      setIsCheckingMatch(false);
+    }
+  };
+
+  // Debounce and trigger database match checking
+  useEffect(() => {
+    if (scanState !== "reviewed") return;
+
+    const timer = setTimeout(() => {
+      triggerDatabaseMatch(genericName, brandName, strength, dosageForm, batchNumber);
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [genericName, brandName, strength, dosageForm, batchNumber, scanState]);
 
   // Initialize camera stream
   useEffect(() => {
@@ -211,6 +282,17 @@ export function ScanClient() {
       }
       
       setScanState("reviewed");
+
+      // Trigger database match checking immediately on load
+      if (data.generic_name && data.strength && data.dosage_form && data.batch_number) {
+        triggerDatabaseMatch(
+          data.generic_name,
+          data.brand_name || "",
+          data.strength,
+          data.dosage_form,
+          data.batch_number
+        );
+      }
     } catch (err) {
       console.error(err);
       const msg = err instanceof Error ? err.message : "An unexpected error occurred while analyzing the label.";
@@ -263,7 +345,20 @@ export function ScanClient() {
     setAiQuantity(null);
     setAiUnit(null);
     setApiError(null);
+    setMatchResult({
+      matchType: null,
+      medicine: null,
+      matchingBatch: null,
+      existingBatches: [],
+    });
   };
+
+  const hasExpiryMismatch = !!(
+    matchResult.matchType === "existing_batch" &&
+    matchResult.matchingBatch &&
+    expiryDate &&
+    matchResult.matchingBatch.expiry_date !== expiryDate
+  );
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -524,6 +619,142 @@ export function ScanClient() {
               </div>
             </div>
 
+            {/* Live Database Matching Panel */}
+            {matchResult.matchType && (
+              <div className="rounded-3xl border border-[#E2E8F0] p-5 bg-[#F8FAFC]/50 dark:border-white/5 dark:bg-[#1E293B]/20 backdrop-blur space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black uppercase tracking-wider text-[#475569] dark:text-slate-400">
+                    Database Matching Verification
+                  </span>
+                  {isCheckingMatch && (
+                    <span className="flex items-center gap-1 text-[10px] text-[#2563EB] dark:text-[#60A5FA] font-bold">
+                      <Loader2 className="size-3 animate-spin" />
+                      Checking matching...
+                    </span>
+                  )}
+                </div>
+
+                {matchResult.matchType === "new_medicine" && (
+                  <div className="rounded-2xl border border-cyan-200 bg-cyan-50/40 p-4 dark:border-cyan-900/30 dark:bg-cyan-950/10 space-y-2.5 transition duration-300">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex size-9 items-center justify-center rounded-xl bg-cyan-100 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-400">
+                        <Sparkles className="size-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-cyan-900 dark:text-cyan-300 text-sm">
+                          🆕 Bagong Medisina (New Catalog Entry)
+                        </h4>
+                        <p className="text-xs text-cyan-700 dark:text-cyan-400/80 mt-0.5">
+                          Ang medisina na ito ay wala pa sa global master catalog.
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-cyan-800 dark:text-cyan-400 leading-relaxed pl-11">
+                      Kapag kinumpirma at sinave mo ito, <strong>awtomatikong marerehistro</strong> ang medisina sa global list (`medicine_master`) at gagawa ng bagong stock batch sa iyong barangay center cabinet.
+                    </p>
+                  </div>
+                )}
+
+                {matchResult.matchType === "existing_medicine_new_batch" && (
+                  <div className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4 dark:border-indigo-900/30 dark:bg-indigo-950/10 space-y-3 transition duration-300">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex size-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400">
+                        <Layers className="size-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-indigo-900 dark:text-indigo-300 text-sm">
+                          📦 Katugmang Medisina, Bagong Batch (Existing Medicine, New Batch)
+                        </h4>
+                        <p className="text-xs text-indigo-700 dark:text-indigo-400/80 mt-0.5">
+                          Nahanap ang medisina sa global master catalog.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="pl-11 space-y-2.5">
+                      <p className="text-xs text-indigo-800 dark:text-indigo-400 leading-relaxed">
+                        Katugma nito ang existing catalog record: <strong className="text-indigo-900 dark:text-indigo-300 font-extrabold">{matchResult.medicine?.generic_name} {matchResult.medicine?.brand_name ? `(${matchResult.medicine?.brand_name})` : ""} - {matchResult.medicine?.strength}, {matchResult.medicine?.dosage_form}</strong>. 
+                        Dahil bago ang batch number o iba ang expiry date, ito ay ilalagay bilang <strong>bagong hiwalay na batch</strong> sa iyong stock.
+                      </p>
+
+                      {matchResult.existingBatches.length > 0 && (
+                        <div className="rounded-xl bg-indigo-100/30 dark:bg-indigo-950/30 p-2.5 border border-indigo-100 dark:border-indigo-900/10">
+                          <span className="block text-[10px] font-bold text-indigo-900 dark:text-indigo-300 uppercase tracking-wider mb-1.5">
+                            Ibang Active Batches sa Iyong Barangay:
+                          </span>
+                          <div className="space-y-1">
+                            {matchResult.existingBatches.map((b, idx) => (
+                              <div key={idx} className="flex justify-between text-[11px] text-indigo-800 dark:text-indigo-400 font-medium">
+                                <span>Batch #{b.batch_number}</span>
+                                <span>Stock: {b.quantity} {b.unit} (Exp: {b.expiry_date})</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {matchResult.matchType === "existing_batch" && (
+                  <div className="rounded-2xl border border-green-200 bg-green-50/40 p-4 dark:border-green-900/30 dark:bg-green-950/10 space-y-3 transition duration-300">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex size-9 items-center justify-center rounded-xl bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400">
+                        <CheckCircle2 className="size-5 animate-pulse" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-green-900 dark:text-green-300 text-sm">
+                          ⚡ Katugmang Batch (Existing Batch Match)
+                        </h4>
+                        <p className="text-xs text-green-700 dark:text-green-400/80 mt-0.5">
+                          Tugma sa umiiral na batch ng medisina sa iyong cabinet.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="pl-11 space-y-2.5">
+                      <p className="text-xs text-green-800 dark:text-green-400 leading-relaxed">
+                        Mayroon nang Batch <strong className="underline">#{matchResult.matchingBatch?.batch_number}</strong> para sa medisinang ito sa iyong center (Expiry: {matchResult.matchingBatch?.expiry_date}).
+                        Ang bagong quantity na iyong i-save ay <strong>idadagdag sa kasalukuyang stock</strong>.
+                      </p>
+
+                      {/* Quantity Live Formula Addition block */}
+                      {manualQty && parseInt(manualQty, 10) > 0 && (
+                        <div className="inline-flex items-center gap-3 px-3 py-2 rounded-xl bg-green-100/50 dark:bg-green-950/40 border border-green-200/50 dark:border-green-900/20 text-xs font-bold text-green-900 dark:text-green-300">
+                          <span>Kasalukuyang stock: {matchResult.matchingBatch?.quantity ?? 0} {manualUnit}</span>
+                          <span>+</span>
+                          <span>Bagong scan: {manualQty} {manualUnit}</span>
+                          <span>=</span>
+                          <span className="text-green-600 dark:text-green-400 font-extrabold text-sm underline decoration-double">
+                            {(matchResult.matchingBatch?.quantity ?? 0) + parseInt(manualQty, 10)} {manualUnit}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Expiry Date Mismatch Warning */}
+                {matchResult.matchType === "existing_batch" && 
+                 matchResult.matchingBatch && 
+                 expiryDate && 
+                 matchResult.matchingBatch.expiry_date !== expiryDate && (
+                  <div className="rounded-2xl border border-red-200 bg-red-50 p-4 dark:border-red-900/30 dark:bg-red-950/20 space-y-2">
+                    <div className="flex items-center gap-2 text-red-900 dark:text-red-300 font-extrabold text-xs">
+                      <AlertTriangle className="size-4 shrink-0 text-red-600 animate-bounce" />
+                      ⚠️ WARNING: Magkaiba ang Expiry Date!
+                    </div>
+                    <p className="text-xs text-red-800 dark:text-red-400 pl-6 leading-relaxed">
+                      Ang batch na <strong>#{matchResult.matchingBatch.batch_number}</strong> ay may expiry date na <strong>{matchResult.matchingBatch.expiry_date}</strong> sa database, ngunit ang iyong in-enter ngayon ay <strong>{expiryDate}</strong>.
+                    </p>
+                    <p className="text-xs text-red-700 dark:text-red-400 pl-6 font-semibold leading-relaxed">
+                      Upang maiwasan ang maling records (Rule 8), pakipalitan ang Batch Number (e.g. maglagay ng suffix tulad ng <strong>#{matchResult.matchingBatch.batch_number}-B</strong>) o kaya ay itama ang expiry date para magkatugma sila.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="rounded-2xl border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-3 dark:border-[#1D4ED8]/30 dark:bg-[#1D4ED8]/10">
               <p className="text-xs font-semibold text-[#1D4ED8] dark:text-[#93C5FD]">
                 📦 <strong>How to count:</strong> Always enter the <u>total individual count</u> — not boxes or packs.
@@ -632,7 +863,7 @@ export function ScanClient() {
               </button>
               <button
                 type="submit"
-                disabled={!manualQty || isSaving}
+                disabled={!manualQty || isSaving || hasExpiryMismatch}
                 className="flex items-center gap-2 rounded-2xl bg-[#16A34A] hover:bg-[#15803D] disabled:opacity-50 text-white px-6 py-3 font-bold shadow-md shadow-green-500/10 transition"
               >
                 {isSaving ? (

@@ -14,8 +14,8 @@ export const PROOF_BUCKET = "bhw-proof-documents";
 
 const allowedProofMimeTypes = [
   "application/pdf",
-  "image/jpeg",
-  "image/png",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
 export function isProfileComplete(profile: ProfileRow | null) {
@@ -38,7 +38,7 @@ export function validateProofDocument(file: File | null) {
   }
 
   if (!allowedProofMimeTypes.includes(file.type)) {
-    return "Please upload a PDF, JPG, or PNG proof document.";
+    return "Please upload a PDF or Word proof document.";
   }
 
   if (file.size > 5 * 1024 * 1024) {

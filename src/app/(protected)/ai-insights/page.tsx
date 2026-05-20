@@ -4,7 +4,7 @@ import { AiInsightsClient } from "./ai-insights-client";
 export default function AiInsightsPage() {
   return (
     <ProtectedShell title="Gemini AI Health Insights">
-      <AiInsightsClient />
+      <AiInsightsClient scope="local" />
     </ProtectedShell>
   );
 }

@@ -98,17 +98,39 @@ export default async function SignupPage({
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="displayName">
-                  Full Name
+                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="firstName">
+                  First Name
                 </label>
-                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="displayName" name="displayName" required type="text" />
+                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="firstName" name="firstName" required type="text" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="contactNumber">
-                  Contact Number
+                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="lastName">
+                  Last Name
                 </label>
-                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="contactNumber" name="contactNumber" required type="text" />
+                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="lastName" name="lastName" required type="text" />
               </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="middleName">
+                  Middle Name <span className="text-[#64748B] dark:text-slate-400">(optional)</span>
+                </label>
+                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="middleName" name="middleName" type="text" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="suffix">
+                  Suffix <span className="text-[#64748B] dark:text-slate-400">(optional)</span>
+                </label>
+                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="suffix" name="suffix" type="text" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="contactNumber">
+                Contact Number
+              </label>
+              <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" id="contactNumber" name="contactNumber" required type="text" />
             </div>
 
             <MapLocationPicker />
@@ -118,7 +140,7 @@ export default async function SignupPage({
                 Proof Document
               </label>
               <input
-                accept=".pdf,image/png,image/jpeg"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] file:mr-4 file:rounded-xl file:border-0 file:bg-[#2563EB] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#1D4ED8] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:file:bg-[#2563EB]"
                 id="proofDocument"
                 name="proofDocument"
@@ -127,7 +149,7 @@ export default async function SignupPage({
               />
               <p className="text-xs leading-6 text-[#64748B] dark:text-slate-400">
                 Upload one supporting file such as a valid ID, BHW accreditation,
-                or health center endorsement. PDF, JPG, or PNG only, up to 5MB.
+                or health center endorsement. PDF or Word document only, up to 5MB.
               </p>
             </div>
 

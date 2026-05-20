@@ -19,15 +19,18 @@ GabayGamot
 
 ## Main Idea
 
-GabayGamot is an AI-assisted medicine inventory, monitoring, dispensing, and referral system for barangay health centers.
+GabayGamot is an AI-assisted medicine inventory, monitoring, dispensing, referral, and consultation-support system for barangay health centers.
 
 It helps barangay health workers:
+- search or create a simple patient record
+- record a simple consultation before medicine handling
 - scan medicine labels using a mobile camera
 - save medicine details by batch and expiry date
 - monitor low stock, out-of-stock, near-expiry, and expired medicines
 - dispense medicine to on-site patients
 - refer patients to the nearest barangay with available stock
 - use actionable AI insights to prevent medicine waste and improve stock planning
+- review reports, audit activity, and CSV exports for accountability
 
 ## Main Users
 
@@ -40,6 +43,7 @@ It helps barangay health workers:
 - monitors all barangay inventories
 - views referral activity
 - views AI insights
+- views global reports, exports, and audit trail activity
 
 ### Barangay Health Worker
 
@@ -47,6 +51,8 @@ It helps barangay health workers:
 - uploads proof documents
 - pins barangay health center location
 - waits for Super Admin approval
+- searches or creates patient records
+- records simple consultations
 - scans medicine
 - reviews AI extracted data
 - manually enters quantity
@@ -54,6 +60,7 @@ It helps barangay health workers:
 - dispenses medicine
 - logs illness category
 - generates referral if medicine is unavailable
+- reviews local reports, exports, and audit trail activity
 
 ### Patient / Resident
 
@@ -64,7 +71,7 @@ It helps barangay health workers:
 
 ## Core Flow
 
-Register → Verify → Scan → Save Stock → Monitor → Dispense → Refer if Out of Stock → AI Gives Actionable Insights
+Register -> Verify -> Patient Search/Create -> Consultation -> Medicine Request -> Dispense or Refer -> AI Gives Actionable Insights -> Reports and Audit Review
 
 ## Important Rules
 
@@ -78,10 +85,18 @@ Register → Verify → Scan → Save Stock → Monitor → Dispense → Refer i
 - Gemini extracts and suggests only.
 - BHW reviews and confirms before saving.
 - Quantity is manually entered by BHW.
+- Keep patient data minimal for MVP privacy and hackathon simplicity.
+- Patient has no login and is handled on-site only by the BHW.
+- Consultation records should be the safest basis for dispense or referral actions when available.
 - Use batch-based inventory.
 - Expired medicine cannot be dispensed or referred.
 - Stock is deducted only after dispensing or completed referral release.
-- AI Insights must include Observation, Reason, Risk, and Recommended Action.
+- AI insights must include Observation, Reason, Risk, and Recommended Action.
+- AI insights explain inventory, expiry, usage, referral, and illness trend patterns only. They do not diagnose or prescribe medicine.
+- Reports and exports must remain authenticated and scoped by role.
+- BHW reports show local health center data only.
+- Super Admin reports may show global barangay data.
+- Export basics use CSV only for MVP and avoid patient full names.
 
 ## UI Theme
 

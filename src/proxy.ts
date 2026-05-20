@@ -13,6 +13,7 @@ export const config = {
     "/onboarding",
     "/pending-approval",
     "/dashboard/:path*",
+    "/patients/:path*",
     "/scan/:path*",
     "/inventory/:path*",
     "/dispense/:path*",

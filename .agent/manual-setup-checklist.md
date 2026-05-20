@@ -30,6 +30,7 @@
 - [ ] Supabase confirm-signup email template points to `/auth/confirm`
 - [ ] Supabase confirm-signup email template points to `/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/pending-approval`
 - [ ] Supabase Storage bucket for BHW proof documents exists after migrations are applied
+- [ ] Supabase Phase 17 `audit_events` migration is applied before relying on persisted audit trail records
 - [ ] `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` is set if future map UI work needs it
 - [ ] `ADDRESS_API_BASE_URL` matches the chosen PSGC endpoint
 

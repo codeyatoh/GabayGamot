@@ -32,7 +32,10 @@ function onboardingMessagePath(message: string) {
 }
 
 function validateProfileFields(formData: FormData) {
-  const displayName = getFormValue(formData, "displayName");
+  const firstName = getFormValue(formData, "firstName");
+  const middleName = getFormValue(formData, "middleName");
+  const lastName = getFormValue(formData, "lastName");
+  const suffix = getFormValue(formData, "suffix");
   const contactNumber = getFormValue(formData, "contactNumber");
   const province = getFormValue(formData, "province");
   const municipality = getFormValue(formData, "municipality");
@@ -40,9 +43,18 @@ function validateProfileFields(formData: FormData) {
   const latitude = getFormValue(formData, "latitude");
   const longitude = getFormValue(formData, "longitude");
   const mapboxPlaceName = getFormValue(formData, "mapboxPlaceName");
+  const displayName = [
+    firstName,
+    middleName,
+    lastName,
+    suffix,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   if (
-    !displayName ||
+    !firstName ||
+    !lastName ||
     !contactNumber ||
     !province ||
     !municipality ||
@@ -51,7 +63,7 @@ function validateProfileFields(formData: FormData) {
     !longitude
   ) {
     return {
-      error: "Please complete all required BHW profile and location fields.",
+      error: "Please complete the required first name, last name, profile, and location fields.",
       values: null,
       location: null,
     };

@@ -6,6 +6,7 @@ import type { Database } from "@/types/database";
 
 const protectedPrefixes = [
   "/dashboard",
+  "/patients",
   "/scan",
   "/inventory",
   "/dispense",

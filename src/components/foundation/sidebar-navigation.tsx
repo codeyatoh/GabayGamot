@@ -11,6 +11,9 @@ import {
   ArrowLeftRight,
   Camera,
   ClipboardList,
+  FileText,
+  Stethoscope,
+  Users,
 } from "lucide-react";
 
 interface RouteItem {
@@ -21,11 +24,14 @@ interface RouteItem {
 
 const bhwRoutes: RouteItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/patients", label: "Patients", icon: Users },
   { href: "/scan", label: "Scan Medicine", icon: Camera },
   { href: "/inventory", label: "Inventory", icon: Boxes },
   { href: "/dispense", label: "Dispense", icon: Activity },
+  { href: "/illnesses", label: "Illness Cases", icon: Stethoscope },
   { href: "/ai-insights", label: "AI Insights", icon: Sparkles },
   { href: "/referrals", label: "Referral Suggestions", icon: ArrowLeftRight },
+  { href: "/reports", label: "Reports & Exports", icon: FileText },
 ];
 
 const adminRoutes: RouteItem[] = [
@@ -33,6 +39,8 @@ const adminRoutes: RouteItem[] = [
   { href: "/admin/inventory", label: "All Inventories", icon: Boxes },
   { href: "/admin/referrals", label: "Referral Activity", icon: ClipboardList },
   { href: "/admin/insights", label: "Global AI Insights", icon: Sparkles },
+  { href: "/admin/reports", label: "Reports & Exports", icon: FileText },
+  { href: "/illnesses", label: "Global Illnesses", icon: Stethoscope },
 ];
 
 export function SidebarNavigation({ isAdmin }: { isAdmin: boolean }) {

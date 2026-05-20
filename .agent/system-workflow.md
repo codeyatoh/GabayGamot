@@ -25,6 +25,19 @@ PHASE 17 - Reports, Audit Trail, and Export Basics
 PHASE 18 - Security Hardening and RLS Review  
 PHASE 19 - Responsive QA, PWA Readiness, and Final Testing  
 
+## Compatibility Note
+
+- For later-phase maintenance work, prefer additive alignments over rebuilds.
+- The current safe patient MVP overlay is:
+  - Patient Search or Create
+  - Record Consultation
+  - Create Medicine Request
+  - Dispense if local stock is enough
+  - Refer if stock is unavailable or insufficient
+  - Preserve illness trends, dispensing logs, referral records, and AI insight surfaces
+- Do not replace working inventory, scan, dispensing, referral, dashboard, or AI routes just to introduce patient records.
+- If a new flow can be layered onto existing routes using optional references and compatibility links, prefer that over schema or route rewrites.
+
 ## Build Rules
 
 - Continue only the next unfinished phase.

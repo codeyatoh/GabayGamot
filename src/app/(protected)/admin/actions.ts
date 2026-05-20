@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { recordAuditEvent } from "@/lib/supabase/audit";
 import { getCurrentProfile } from "@/lib/supabase/profiles";
 
 async function ensureSuperAdmin() {
@@ -24,6 +25,16 @@ export async function approveBhw(bhwId: string) {
     throw new Error(`Failed to approve BHW: ${error.message}`);
   }
 
+  await recordAuditEvent({
+    eventType: "bhw_approved",
+    entityType: "profile",
+    entityId: bhwId,
+    summary: "Approved a BHW account.",
+    metadata: {
+      bhw_id: bhwId,
+    },
+  });
+
   revalidatePath("/admin");
 }
 
@@ -39,6 +50,16 @@ export async function rejectBhw(bhwId: string) {
   if (error) {
     throw new Error(`Failed to reject BHW: ${error.message}`);
   }
+
+  await recordAuditEvent({
+    eventType: "bhw_rejected",
+    entityType: "profile",
+    entityId: bhwId,
+    summary: "Rejected a BHW account.",
+    metadata: {
+      bhw_id: bhwId,
+    },
+  });
 
   revalidatePath("/admin");
 }

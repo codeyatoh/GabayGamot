@@ -61,6 +61,8 @@ NEXT_PUBLIC_ENABLE_DEMO_MODE=false
 9. Configure Supabase Storage for proof documents.
 10. Configure Supabase RLS policies.
 11. Deploy to Vercel after local build passes.
+12. Apply the latest Phase 16 migration for patient, consultation, and consultation medicine request support before testing the consultation-first flow.
+13. Apply the Phase 17 migration for `audit_events` before expecting persisted audit trail records.
 
 ## Current Integration Notes
 

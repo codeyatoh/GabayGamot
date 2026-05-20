@@ -44,6 +44,37 @@ export function ScanClient() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Auto-suggest unit based on the AI-extracted dosage form
+  useEffect(() => {
+    if (!dosageForm) return;
+    const form = dosageForm.toLowerCase().trim();
+    if (form.includes("tablet")) {
+      setManualUnit("tabs");
+    } else if (form.includes("capsule")) {
+      setManualUnit("caps");
+    } else if (
+      form.includes("syrup") ||
+      form.includes("suspension") ||
+      form.includes("solution") ||
+      form.includes("drops") ||
+      form.includes("elixir")
+    ) {
+      setManualUnit("mL");
+    } else if (form.includes("sachet")) {
+      setManualUnit("sachets");
+    } else if (
+      form.includes("cream") ||
+      form.includes("ointment") ||
+      form.includes("gel")
+    ) {
+      setManualUnit("g");
+    } else if (form.includes("vial") || form.includes("ampule") || form.includes("injection")) {
+      setManualUnit("vials");
+    } else {
+      setManualUnit("pcs");
+    }
+  }, [dosageForm]);
+
   // Initialize camera stream
   useEffect(() => {
     let activeStream: MediaStream | null = null;
@@ -468,34 +499,50 @@ export function ScanClient() {
               </div>
             </div>
 
+            <div className="rounded-2xl border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-3 dark:border-[#1D4ED8]/30 dark:bg-[#1D4ED8]/10">
+              <p className="text-xs font-semibold text-[#1D4ED8] dark:text-[#93C5FD]">
+                📦 <strong>How to count:</strong> Always enter the <u>total individual count</u> — not boxes or packs.
+                Example: 2 boxes × 100 tablets = enter <strong>200 tabs</strong>. For syrups, enter total mL (e.g. 3 bottles × 60mL = <strong>180 mL</strong>).
+              </p>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-[#2563EB] dark:text-[#60A5FA]">
-                  * Quantity (Enter Manually)
+                  * Quantity (Total Individual Count)
                 </label>
                 <input
                   type="number"
                   min="1"
                   required
-                  placeholder="Enter count"
+                  placeholder="e.g. 200 (not 2 boxes)"
                   value={manualQty}
                   onChange={(e) => setManualQty(e.target.value)}
                   className="mt-2 w-full rounded-2xl border-2 border-[#2563EB] bg-white px-4 py-3 text-sm font-semibold text-[#1E293B] focus:outline-none dark:bg-[#1F2937] dark:text-slate-100"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#64748B] dark:text-slate-400">Unit</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#64748B] dark:text-slate-400">
+                  Unit <span className="normal-case font-normal text-[#94A3B8]">(auto-suggested from Dosage Form)</span>
+                </label>
                 <select
                   value={manualUnit}
                   onChange={(e) => setManualUnit(e.target.value)}
                   className="mt-2 w-full rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm font-semibold text-[#1E293B] focus:outline-none focus:border-[#BFDBFE] dark:border-white/10 dark:bg-[#1F2937] dark:text-slate-100"
                 >
-                  <option value="pcs">Pieces (pcs)</option>
                   <option value="tabs">Tablets (tabs)</option>
                   <option value="caps">Capsules (caps)</option>
-                  <option value="bottles">Bottles (bottles)</option>
-                  <option value="vials">Vials (vials)</option>
+                  <option value="mL">Milliliters — for syrups/suspensions (mL)</option>
+                  <option value="vials">Vials / Ampules (vials)</option>
+                  <option value="sachets">Sachets — e.g. Oresol (sachets)</option>
+                  <option value="g">Grams — for creams/ointments (g)</option>
+                  <option value="pcs">Pieces — for other supplies (pcs)</option>
                 </select>
+                {manualUnit === "pcs" && dosageForm && ![""].includes(dosageForm) && (
+                  <p className="mt-1.5 text-xs text-amber-600 dark:text-amber-400 font-medium">
+                    ⚠️ Double-check: Is &quot;pcs&quot; correct for a <strong>{dosageForm}</strong>? If it&apos;s a tablet or syrup, please update the unit above.
+                  </p>
+                )}
               </div>
             </div>
 

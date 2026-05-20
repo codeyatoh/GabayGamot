@@ -31,6 +31,13 @@ export async function saveScannedMedicineAction(payload: {
       throw new Error("Your health center account is pending admin approval.");
     }
 
+    // Validate unit against known dispensing base units
+    const VALID_UNITS = ["tabs", "caps", "mL", "vials", "sachets", "g", "pcs"];
+    const sanitizedUnit = payload.unit?.trim() || "pcs";
+    if (!VALID_UNITS.includes(sanitizedUnit)) {
+      throw new Error(`Invalid unit "${sanitizedUnit}". Accepted units: ${VALID_UNITS.join(", ")}.`);
+    }
+
     // Load user's health center
     const supabase = await createClient();
     const { data: center, error: centerError } = await supabase
@@ -80,7 +87,7 @@ export async function saveScannedMedicineAction(payload: {
         batch_number: payload.batchNumber,
         quantity: payload.quantity,
         expiry_date: payload.expiryDate,
-        unit: payload.unit || "pcs",
+        unit: sanitizedUnit,
         status: "active",
         created_by: user.id,
       });

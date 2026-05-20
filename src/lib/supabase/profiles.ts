@@ -8,6 +8,7 @@ import type { Database } from "@/types/database";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
+type HealthCenterInsert = Database["public"]["Tables"]["health_centers"]["Insert"];
 
 export const PROOF_BUCKET = "bhw-proof-documents";
 
@@ -18,6 +19,9 @@ const allowedProofMimeTypes = [
 ];
 
 export function isProfileComplete(profile: ProfileRow | null) {
+  if (profile?.role === "super_admin") {
+    return true;
+  }
   return Boolean(
     profile?.display_name &&
       profile.contact_number &&
@@ -116,4 +120,82 @@ export async function uploadProofDocument(userId: string, file: File) {
   }
 
   return objectPath;
+}
+
+export async function upsertHealthCenter(values: HealthCenterInsert) {
+  const admin = createAdminClient();
+
+  const { error } = await admin.from("health_centers").upsert(values, {
+    onConflict: "profile_id",
+  });
+
+  if (error) {
+    throw new Error(`Unable to upsert health center: ${error.message}`);
+  }
+}
+
+export async function seedSuperAdmin() {
+  const email = process.env.SUPER_ADMIN_EMAIL;
+  const password = process.env.SUPER_ADMIN_TEMP_PASSWORD;
+  const displayName = process.env.SUPER_ADMIN_DISPLAY_NAME || "System Owner";
+
+  if (!email || !password) {
+    return;
+  }
+
+  const admin = createAdminClient();
+
+  // Check if super admin profile exists in profiles table
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("id")
+    .eq("role", "super_admin")
+    .maybeSingle();
+
+  if (profile) {
+    return; // Already seeded
+  }
+
+  // Check if auth user exists
+  const { data: usersData, error: listError } = await admin.auth.admin.listUsers();
+  if (listError) {
+    console.error("Failed to list users:", listError.message);
+    return;
+  }
+
+  const existingUser = usersData.users.find((u) => u.email === email);
+
+  let userId: string;
+
+  if (existingUser) {
+    userId = existingUser.id;
+  } else {
+    // Create new auth user
+    const { data: newUser, error: createError } = await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    });
+
+    if (createError) {
+      console.error("Failed to create super admin user:", createError.message);
+      return;
+    }
+
+    userId = newUser.user.id;
+  }
+
+  // Create/update profile row as super_admin
+  const { error: upsertError } = await admin.from("profiles").upsert({
+    id: userId,
+    email,
+    display_name: displayName,
+    role: "super_admin",
+    approval_status: "approved",
+    is_super_admin_seeded: true,
+  });
+
+  if (upsertError) {
+    console.error("Failed to upsert super admin profile:", upsertError.message);
+  }
 }

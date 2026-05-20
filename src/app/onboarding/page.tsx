@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { completeBhwRegistration } from "@/app/signup/actions";
+import { MapLocationPicker } from "@/components/foundation/map-location-picker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentProfile, isProfileComplete } from "@/lib/supabase/profiles";
@@ -59,26 +60,13 @@ export default async function OnboardingPage({
                 </label>
                 <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" defaultValue={profile?.contact_number ?? ""} id="contactNumber" name="contactNumber" required type="text" />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="province">
-                  Province
-                </label>
-                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" defaultValue={profile?.province ?? ""} id="province" name="province" required type="text" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="municipality">
-                  Municipality / City
-                </label>
-                <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" defaultValue={profile?.municipality ?? ""} id="municipality" name="municipality" required type="text" />
-              </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="barangayName">
-                Barangay Health Center Barangay
-              </label>
-              <input className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] outline-none transition focus:border-[#2563EB] focus:ring-2 focus:ring-[#BFDBFE] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:focus:border-[#60A5FA] dark:focus:ring-[#1D4ED8]/40" defaultValue={profile?.barangay_name ?? ""} id="barangayName" name="barangayName" required type="text" />
-            </div>
+            <MapLocationPicker
+              defaultProvince={profile?.province ?? ""}
+              defaultMunicipality={profile?.municipality ?? ""}
+              defaultBarangay={profile?.barangay_name ?? ""}
+            />
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="proofDocument">

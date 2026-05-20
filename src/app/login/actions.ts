@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
+import { seedSuperAdmin } from "@/lib/supabase/profiles";
 
 function getFormValue(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -21,6 +22,9 @@ export async function login(formData: FormData) {
   if (!email || !password) {
     redirect(loginMessagePath("Please enter both email and password."));
   }
+
+  // Seed super admin dynamically before checking credentials
+  await seedSuperAdmin();
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({

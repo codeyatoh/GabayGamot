@@ -26,12 +26,15 @@ export default async function ProtectedLayout({
     redirect("/onboarding?message=Complete your BHW registration to continue.");
   }
 
-  if (!isProfileComplete(profile)) {
-    redirect("/onboarding?message=Complete your BHW registration to continue.");
-  }
+  // Bypass BHW completeness and approval checks for Super Admin
+  if (profile.role !== "super_admin") {
+    if (!isProfileComplete(profile)) {
+      redirect("/onboarding?message=Complete your BHW registration to continue.");
+    }
 
-  if (profile.approval_status !== "approved") {
-    redirect("/pending-approval");
+    if (profile.approval_status !== "approved") {
+      redirect("/pending-approval");
+    }
   }
 
   return children;

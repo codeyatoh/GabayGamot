@@ -7,6 +7,7 @@ import { getAppUrl } from "@/lib/env/public";
 import {
   ensureProfileForUser,
   updateProfileById,
+  upsertHealthCenter,
   uploadProofDocument,
   validateProofDocument,
 } from "@/lib/supabase/profiles";
@@ -36,11 +37,23 @@ function validateProfileFields(formData: FormData) {
   const province = getFormValue(formData, "province");
   const municipality = getFormValue(formData, "municipality");
   const barangayName = getFormValue(formData, "barangayName");
+  const latitude = getFormValue(formData, "latitude");
+  const longitude = getFormValue(formData, "longitude");
+  const mapboxPlaceName = getFormValue(formData, "mapboxPlaceName");
 
-  if (!displayName || !contactNumber || !province || !municipality || !barangayName) {
+  if (
+    !displayName ||
+    !contactNumber ||
+    !province ||
+    !municipality ||
+    !barangayName ||
+    !latitude ||
+    !longitude
+  ) {
     return {
-      error: "Please complete all required BHW profile fields.",
+      error: "Please complete all required BHW profile and location fields.",
       values: null,
+      location: null,
     };
   }
 
@@ -52,6 +65,14 @@ function validateProfileFields(formData: FormData) {
       province,
       municipality,
       barangay_name: barangayName,
+    },
+    location: {
+      province,
+      municipality,
+      barangay_name: barangayName,
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+      mapbox_place_name: mapboxPlaceName || null,
     },
   };
 }
@@ -106,6 +127,13 @@ export async function registerBhw(formData: FormData) {
     approval_status: "pending",
   });
 
+  if (profileValidation.location) {
+    await upsertHealthCenter({
+      profile_id: data.user.id,
+      ...profileValidation.location,
+    });
+  }
+
   revalidatePath("/", "layout");
 
   if (data.session) {
@@ -154,6 +182,13 @@ export async function completeBhwRegistration(formData: FormData) {
     role: "bhw",
     approval_status: "pending",
   });
+
+  if (profileValidation.location) {
+    await upsertHealthCenter({
+      profile_id: user.id,
+      ...profileValidation.location,
+    });
+  }
 
   revalidatePath("/", "layout");
   redirect("/pending-approval");

@@ -3,17 +3,13 @@ import Link from "next/link";
 import { type ReactNode } from "react";
 
 import { getCurrentProfile } from "@/lib/supabase/profiles";
+import { SidebarNavigation } from "./sidebar-navigation";
 
-const protectedRoutes = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/scan", label: "Scan Medicine" },
-  { href: "/inventory", label: "Inventory" },
-  { href: "/dispense", label: "Dispense" },
-  { href: "/ai-insights", label: "AI Insights" },
-  { href: "/referrals", label: "Referral Suggestions" },
-];
+function formatApprovalStatus(status: string | null | undefined, role?: string) {
+  if (role === "super_admin") {
+    return "Verified Super Admin";
+  }
 
-function formatApprovalStatus(status: string | null | undefined) {
   if (!status) {
     return "Profile pending";
   }
@@ -34,7 +30,8 @@ export async function ProtectedShell({
   const { user, profile } = await getCurrentProfile();
   const displayName = profile?.display_name || user?.email || "Signed-in user";
   const subtitle = profile?.email || user?.email || "Authenticated account";
-  const approvalStatus = formatApprovalStatus(profile?.approval_status);
+  const approvalStatus = formatApprovalStatus(profile?.approval_status, profile?.role);
+  const isAdmin = profile?.role === "super_admin";
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A]">
@@ -48,6 +45,7 @@ export async function ProtectedShell({
                 height={24}
                 src="/assets/images/gabay-gamot-logo-sm.png"
                 width={24}
+                priority
               />
             </span>
             <div>
@@ -55,11 +53,11 @@ export async function ProtectedShell({
                 GabayGamot
               </p>
               <p className="text-xs text-[#64748B] dark:text-slate-400">
-                Protected foundation
+                {isAdmin ? "Admin Panel" : "Protected dashboard"}
               </p>
             </div>
           </Link>
-
+ 
           <div className="mb-6 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 dark:border-white/10 dark:bg-white/5">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#64748B] dark:text-slate-400">
               Signed In
@@ -74,18 +72,8 @@ export async function ProtectedShell({
               {approvalStatus}
             </p>
           </div>
-
-          <nav className="space-y-2">
-            {protectedRoutes.map((route) => (
-              <Link
-                key={route.href}
-                className="block rounded-2xl px-4 py-3 text-sm font-medium text-[#64748B] transition-colors hover:bg-[#EFF6FF] hover:text-[#2563EB] dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-[#60A5FA]"
-                href={route.href}
-              >
-                {route.label}
-              </Link>
-            ))}
-          </nav>
+ 
+          <SidebarNavigation isAdmin={isAdmin} />
 
           <form action="/auth/signout" className="mt-6" method="post">
             <button

@@ -1,10 +1,10 @@
 import { ProtectedShell } from "@/components/foundation/protected-shell";
-import { RoutePlaceholder } from "@/components/foundation/route-placeholder";
+import { AiInsightsClient } from "./ai-insights-client";
 
 export default function AiInsightsPage() {
   return (
-    <ProtectedShell title="AI Insights">
-      <RoutePlaceholder description="This placeholder reserves the AI insights route without starting Gemini or recommendation logic yet." />
+    <ProtectedShell title="Gemini AI Health Insights">
+      <AiInsightsClient />
     </ProtectedShell>
   );
 }

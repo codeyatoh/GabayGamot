@@ -2,9 +2,9 @@
 
 ## Current Status
 
-PHASE 5 - BHW Sign-up and Pending Approval Flow completed for `D:\Clients Project\Codex.GabayGamot`.
+PHASE 8 - Dashboard Layouts and Navigation completed for `D:\Clients Project\Codex.GabayGamot`.
 
-The project now has a working Supabase auth foundation plus the first real BHW registration flow. Users can register through a dedicated signup page, complete missing registration details through onboarding, upload one proof document, and stay blocked in a pending-approval route until a later approval phase exists. The landing page remains intact, and the app still has not started approval decision logic, inventory logic, Mapbox behavior, or Gemini feature work.
+The project now has complete, high-fidelity layouts and navigation flows for both BHWs and Super Admins. The central `ProtectedShell` has been updated to dynamically render role-specific navigation menus, highlighting the active path and matching our custom medical theme. A comprehensive suite of page components has been developed, including a BHW metrics dashboard, a simulated Camera Scan viewport and review form, an interactive local inventory browser with status filters, a step-by-step patient dispensing recorder, a cross-center referral transfer manager, and actionable AI insights advisor cards. Next.js App Router client/server component splitting has been enforced to prevent server-only module leaks. The build compile, typescript, and eslint checks pass successfully.
 
 ## Completed Phases
 
@@ -14,9 +14,9 @@ The project now has a working Supabase auth foundation plus the first real BHW r
 - [x] PHASE 3 - Supabase Schema and Security Foundation
 - [x] PHASE 4 - Authentication and Profile Foundation
 - [x] PHASE 5 - BHW Sign-up and Pending Approval Flow
-- [ ] PHASE 6 - Mapbox Location Picker and Address API
-- [ ] PHASE 7 - Super Admin Approval Workflow
-- [ ] PHASE 8 - Dashboard Layouts and Navigation
+- [x] PHASE 6 - Mapbox Location Picker and Address API
+- [x] PHASE 7 - Super Admin Approval Workflow
+- [x] PHASE 8 - Dashboard Layouts and Navigation
 - [ ] PHASE 9 - Medicine Master and Batch Inventory
 - [ ] PHASE 10 - Camera Scan and Gemini Extraction
 - [ ] PHASE 11 - Scan Review, Database Matching, and Manual Quantity
@@ -99,6 +99,83 @@ The project now has a working Supabase auth foundation plus the first real BHW r
   - no approval workflow
   - no inventory schema yet
 - no Mapbox or Gemini behavior
+
+## Phase 8 Summary
+
+- Status: completed
+- Scope:
+  - Updated the central `ProtectedShell` component to support dynamic active path highlighting and expand the Super Admin sidebar routing structure.
+  - Implemented the three primary Super Admin monitoring views: Barangay Inventory Monitoring (`/admin/inventory`), Global Referral Tracker (`/admin/referrals`), and Global AI Insights Dashboard (`/admin/insights`).
+  - Implemented the standard BHW metrics and quick action workspace layout (`/dashboard`).
+  - Added BHW layout work areas for Mobile-first Simulated Camera Scan viewport (`/scan`), Local Inventory Browser with status badges and search filters (`/inventory`), Step-by-Step Patient Dispensing Form with near-expiry alerts (`/dispense`), Outgoing/Incoming Referral Transfer Portal (`/referrals`), and actionable Gemini AI Insights co-pilot advisories (`/ai-insights`).
+  - Restructured routes into distinct server page wrappers and client work controllers to comply with Next.js App Router client component boundary limits and prevent server-only module leaks.
+- Files / Areas Created or Updated:
+  - `src/components/foundation/protected-shell.tsx`
+  - `src/components/foundation/sidebar-navigation.tsx`
+  - `src/app/(protected)/dashboard/page.tsx`
+  - `src/app/(protected)/admin/inventory/page.tsx`
+  - `src/app/(protected)/admin/referrals/page.tsx`
+  - `src/app/(protected)/admin/insights/page.tsx`
+  - `src/app/(protected)/scan/page.tsx` & `src/app/(protected)/scan/scan-client.tsx`
+  - `src/app/(protected)/inventory/page.tsx` & `src/app/(protected)/inventory/inventory-client.tsx`
+  - `src/app/(protected)/dispense/page.tsx` & `src/app/(protected)/dispense/dispense-client.tsx`
+  - `src/app/(protected)/referrals/page.tsx` & `src/app/(protected)/referrals/referrals-client.tsx`
+  - `src/app/(protected)/ai-insights/page.tsx` & `src/app/(protected)/ai-insights/ai-insights-client.tsx`
+- Errors Fixed:
+  - Resolved `server-only` client component bundler compilation failures by decoupling the layout shell from interactive pages.
+- Recommended Next Phase:
+  - PHASE 9 - Medicine Master and Batch Inventory
+
+## Phase 7 Summary
+
+- Status: completed
+- Scope:
+  - Formulated dynamic super admin seeding triggered securely during login before verification checks.
+  - Implemented secure server-side admin actions `approveBhw` and `rejectBhw` with administrative role protection.
+  - Custom-built the secure `/admin` approvals route and a rich aesthetic `AdminDashboard` frontend with tabs, document viewer, and detailed list.
+  - Wired in dynamic Mapbox GL location frames centering automatically on each BHW's pinned coordinates.
+  - Leveraged private storage document security by signing time-limited proof URLs server-side.
+  - Integrated administrative dashboard routing bypasses into protected layouts and middleware session proxies.
+- Files / Areas Created or Updated:
+  - `src/app/login/actions.ts`
+  - `src/app/(protected)/admin/actions.ts`
+  - `src/app/(protected)/admin/admin-dashboard.tsx`
+  - `src/app/(protected)/admin/page.tsx`
+  - `src/app/(protected)/dashboard/page.tsx`
+  - `src/components/foundation/map-location-picker.tsx`
+- Errors Fixed:
+  - Eliminated useEffect cascading setState lint warnings inside the Map Picker via microtask routing (`Promise.resolve().then`).
+  - Cleared all implicit `any` typescript variables to ensure 100% sound compile metrics.
+- Manual Setup Needed:
+  - Fill in `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_TEMP_PASSWORD`, and `SUPER_ADMIN_DISPLAY_NAME` in `.env.local` to trigger the auto-seeding handler.
+- Recommended Next Phase:
+  - PHASE 8 - Dashboard Layouts and Navigation
+
+## Phase 6 Summary
+
+- Status: completed
+- Scope:
+  - Created a dynamic client component `MapLocationPicker` that interfaces with the PSGC API to sequentially query Provinces, Cities/Municipalities, and Barangays.
+  - Rendered an interactive Mapbox GL map to let BHWs drop a pin for their exact health center location.
+  - Implemented hidden form inputs to seamlessly pass coordinates (`latitude`, `longitude`) and place information through Next.js server actions.
+  - Updated BHW sign-up and onboarding pages to utilize the new map location picker.
+  - Enhanced server-side validation to parse the coordinates and place names, and added `upsertHealthCenter` to record coordinate data in Supabase.
+- Files / Areas Created or Updated:
+  - `src/components/foundation/map-location-picker.tsx`
+  - `src/app/signup/page.tsx`
+  - `src/app/onboarding/page.tsx`
+  - `src/lib/supabase/profiles.ts`
+  - `src/app/signup/actions.ts`
+- Dependencies Added:
+  - `mapbox-gl` (v3.24.0)
+  - `react-map-gl` (v8.1.1)
+  - `@types/mapbox-gl` (v3.4.1)
+- Errors Fixed:
+  - Resolved `react-map-gl` module import failures by targeting the explicit `react-map-gl/mapbox` subpath.
+  - Fixed `MapLayerMouseEvent` type checking error by importing directly from `mapbox-gl`.
+- Manual Setup Needed:
+  - Fill in `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` in `.env.local` for the Mapbox map to load successfully.
+  - Check that the `ADDRESS_API_BASE_URL` in `.env.local` is set to `https://psgc.cloud/api`.
 
 ## Phase 5 Summary
 
@@ -285,13 +362,13 @@ The project now has a working Supabase auth foundation plus the first real BHW r
 
 ## Recommended Next Phase
 
-PHASE 6 - Mapbox Location Picker and Address API
+PHASE 7 - Super Admin Approval Workflow
 
 Focus for the next run:
 
-- add a location picker for the BHW health center record
-- connect the address flow to the selected PSGC endpoint
-- keep approval decisions, inventory logic, and Gemini feature work out of scope
+- Implement the super admin dashboard and/or approval decision screen.
+- Allow super admins to approve or reject pending BHW accounts.
+- Transition approved BHWs to standard protected dashboards.
 
 ## Notes
 

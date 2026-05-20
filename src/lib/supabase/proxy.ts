@@ -11,6 +11,7 @@ const protectedPrefixes = [
   "/dispense",
   "/ai-insights",
   "/referrals",
+  "/admin",
 ];
 
 const authEntryPaths = ["/login", "/signup"];
@@ -75,12 +76,18 @@ export async function updateSession(request: NextRequest) {
   if (user && isAuthEntryPath(pathname)) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("display_name,contact_number,barangay_name,municipality,province,proof_document_path,approval_status")
+      .select("role,display_name,contact_number,barangay_name,municipality,province,proof_document_path,approval_status")
       .eq("id", user.id)
       .maybeSingle();
 
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.search = "";
+
+    if (profile?.role === "super_admin") {
+      redirectUrl.pathname = "/admin";
+      redirectUrl.searchParams.set("message", "You are already signed in.");
+      return NextResponse.redirect(redirectUrl);
+    }
 
     const isComplete = Boolean(
       profile?.display_name &&

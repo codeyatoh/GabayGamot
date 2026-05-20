@@ -12,3 +12,7 @@ export function getSupabaseServiceRoleKey() {
 
   return value;
 }
+
+export function getGeminiApiKey() {
+  return process.env.GEMINI_API_KEY;
+}

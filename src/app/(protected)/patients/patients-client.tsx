@@ -14,6 +14,18 @@ import {
 
 import { createPatientAction, recordConsultationAction } from "./actions";
 import { PatientAddressPicker } from "@/components/foundation/patient-address-picker";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogBody,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const ILLNESS_CATEGORIES = [
   "Upper Respiratory Infection (URI / Sipon at Ubo)",
@@ -84,6 +96,7 @@ export function PatientsClient({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [isCreatePatientOpen, setIsCreatePatientOpen] = useState(false);
   const [listQuery, setListQuery] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -135,6 +148,9 @@ export function PatientsClient({
     return haystack.includes(listQuery.trim().toLowerCase());
   });
 
+  const fieldClassName =
+    "rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm font-semibold text-[#1E293B] focus:outline-none focus:border-[#BFDBFE] dark:border-white/10 dark:bg-[#1F2937] dark:text-slate-100";
+
   const handleCreatePatient = (event: React.FormEvent) => {
     event.preventDefault();
     setErrorMsg(null);
@@ -159,6 +175,7 @@ export function PatientsClient({
       }
 
       setSuccessMsg(`Patient record created with code ${result.patientCode}.`);
+      setIsCreatePatientOpen(false);
       setFirstName("");
       setMiddleName("");
       setLastName("");
@@ -214,10 +231,7 @@ export function PatientsClient({
   return (
     <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
       <div className="space-y-6">
-        <form
-          onSubmit={handleCreatePatient}
-          className="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#111827] space-y-4"
-        >
+        <div className="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#111827]">
           <div className="flex items-center gap-3">
             <span className="flex size-10 items-center justify-center rounded-2xl bg-[#EFF6FF] text-[#2563EB] dark:bg-white/5 dark:text-[#60A5FA]">
               <UserPlus className="size-5" />
@@ -226,90 +240,125 @@ export function PatientsClient({
               <h2 className="font-bold text-[#1E293B] dark:text-slate-100">
                 Create Patient Record
               </h2>
-              <p className="text-xs text-[#64748B] dark:text-slate-400">
-                Keep the patient profile minimal for the MVP demo.
+              <p className="text-xs leading-5 text-[#64748B] dark:text-slate-400">
+                Open a focused modal to create a new on-site patient without crowding the main consultation screen.
               </p>
             </div>
           </div>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-[#475569] dark:text-slate-300">
+              Keep the patient profile minimal for the MVP demo and create the record only when needed.
+            </p>
+            <Dialog open={isCreatePatientOpen} onOpenChange={setIsCreatePatientOpen}>
+              <DialogTrigger asChild>
+                <Button className="sm:min-w-[190px]">
+                  <UserPlus className="size-4" />
+                  Create New Patient
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Patient</DialogTitle>
+                  <DialogDescription>
+                    Enter the basic patient details needed for the consultation-first flow.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogBody>
+                  <form
+                    id="create-patient-form"
+                    onSubmit={handleCreatePatient}
+                    className="space-y-4"
+                  >
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <input
+                        type="text"
+                        placeholder="First name"
+                        value={firstName}
+                        onChange={(event) => setFirstName(event.target.value)}
+                        required
+                        className={fieldClassName}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Middle name (optional)"
+                        value={middleName}
+                        onChange={(event) => setMiddleName(event.target.value)}
+                        className={fieldClassName}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Last name"
+                        value={lastName}
+                        onChange={(event) => setLastName(event.target.value)}
+                        required
+                        className={fieldClassName}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Suffix (optional)"
+                        value={suffix}
+                        onChange={(event) => setSuffix(event.target.value)}
+                        className={fieldClassName}
+                      />
+                      <input
+                        type="number"
+                        placeholder="Age"
+                        min="0"
+                        max="150"
+                        value={age}
+                        onChange={(event) => setAge(event.target.value)}
+                        required
+                        className={fieldClassName}
+                      />
+                      <select
+                        value={sex}
+                        onChange={(event) => setSex(event.target.value)}
+                        required
+                        className={fieldClassName}
+                      >
+                        <option value="">Sex</option>
+                        <option value="Female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Other">Other</option>
+                        <option value="Prefer not to say">Prefer not to say</option>
+                      </select>
+                    </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <input
-              type="text"
-              placeholder="First name"
-              value={firstName}
-              onChange={(event) => setFirstName(event.target.value)}
-              required
-              className="rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm font-semibold text-[#1E293B] focus:outline-none focus:border-[#BFDBFE] dark:border-white/10 dark:bg-[#1F2937] dark:text-slate-100"
-            />
-            <input
-              type="text"
-              placeholder="Middle name (optional)"
-              value={middleName}
-              onChange={(event) => setMiddleName(event.target.value)}
-              className="rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm font-semibold text-[#1E293B] focus:outline-none focus:border-[#BFDBFE] dark:border-white/10 dark:bg-[#1F2937] dark:text-slate-100"
-            />
-            <input
-              type="text"
-              placeholder="Last name"
-              value={lastName}
-              onChange={(event) => setLastName(event.target.value)}
-              required
-              className="rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm font-semibold text-[#1E293B] focus:outline-none focus:border-[#BFDBFE] dark:border-white/10 dark:bg-[#1F2937] dark:text-slate-100"
-            />
-            <input
-              type="text"
-              placeholder="Suffix (optional)"
-              value={suffix}
-              onChange={(event) => setSuffix(event.target.value)}
-              className="rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm font-semibold text-[#1E293B] focus:outline-none focus:border-[#BFDBFE] dark:border-white/10 dark:bg-[#1F2937] dark:text-slate-100"
-            />
-            <input
-              type="number"
-              placeholder="Age"
-              min="0"
-              max="150"
-              value={age}
-              onChange={(event) => setAge(event.target.value)}
-              required
-              className="rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm font-semibold text-[#1E293B] focus:outline-none focus:border-[#BFDBFE] dark:border-white/10 dark:bg-[#1F2937] dark:text-slate-100"
-            />
-            <select
-              value={sex}
-              onChange={(event) => setSex(event.target.value)}
-              required
-              className="rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm font-semibold text-[#1E293B] focus:outline-none focus:border-[#BFDBFE] dark:border-white/10 dark:bg-[#1F2937] dark:text-slate-100"
-            >
-              <option value="">Sex</option>
-              <option value="Female">Female</option>
-              <option value="Male">Male</option>
-              <option value="Other">Other</option>
-              <option value="Prefer not to say">Prefer not to say</option>
-            </select>
+                    <PatientAddressPicker
+                      barangay={barangay}
+                      cityMunicipality={cityMunicipality}
+                      onBarangayChange={setBarangay}
+                      onCityMunicipalityChange={setCityMunicipality}
+                    />
+
+                    <input
+                      type="text"
+                      placeholder="Contact number (optional)"
+                      value={contactNumber}
+                      onChange={(event) => setContactNumber(event.target.value)}
+                      className={`w-full ${fieldClassName}`}
+                    />
+                  </form>
+                </DialogBody>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="button" variant="outline">
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                  <Button
+                    type="submit"
+                    form="create-patient-form"
+                    disabled={isPending}
+                    className="sm:min-w-[180px]"
+                  >
+                    {isPending ? "Saving patient..." : "Save Patient Record"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
-
-          <PatientAddressPicker
-            barangay={barangay}
-            cityMunicipality={cityMunicipality}
-            onBarangayChange={setBarangay}
-            onCityMunicipalityChange={setCityMunicipality}
-          />
-
-          <input
-            type="text"
-            placeholder="Contact number (optional)"
-            value={contactNumber}
-            onChange={(event) => setContactNumber(event.target.value)}
-            className="w-full rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm font-semibold text-[#1E293B] focus:outline-none focus:border-[#BFDBFE] dark:border-white/10 dark:bg-[#1F2937] dark:text-slate-100"
-          />
-
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full rounded-2xl bg-[#2563EB] px-4 py-3 text-sm font-bold text-white shadow-md shadow-[#2563EB]/15 transition hover:bg-[#1D4ED8] disabled:opacity-50"
-          >
-            {isPending ? "Saving patient..." : "Save Patient Record"}
-          </button>
-        </form>
+        </div>
 
         <div className="rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#111827] space-y-4">
           <div className="flex items-center gap-3">

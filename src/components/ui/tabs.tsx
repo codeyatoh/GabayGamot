@@ -55,7 +55,7 @@ function TabsList({
     <div
       role="tablist"
       className={cn(
-        "inline-flex h-9 items-center rounded-lg bg-[#202020] p-1 text-[#a1a1aa]",
+        "inline-flex min-h-11 items-center rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-1 text-[#64748B] dark:border-white/10 dark:bg-[#0F172A] dark:text-slate-400",
         className
       )}
       {...props}
@@ -81,10 +81,10 @@ function TabsTrigger({
       data-state={isActive ? "active" : "inactive"}
       onClick={() => tabs.setValue(value)}
       className={cn(
-        "inline-flex h-7 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 text-xs font-medium outline-none transition focus-visible:ring-2 focus-visible:ring-[#3b82f6]/40",
+        "inline-flex h-9 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-xs font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#3b82f6]/40",
         isActive
-          ? "bg-[#0a0a0a] text-[#fafafa] shadow-sm"
-          : "text-[#a1a1aa] hover:text-[#fafafa]",
+          ? "bg-white text-[#0F172A] shadow-sm ring-1 ring-[#D9E4F2] dark:bg-[#111827] dark:text-slate-100 dark:ring-white/10"
+          : "text-[#64748B] hover:text-[#0F172A] dark:text-slate-400 dark:hover:text-slate-100",
         className
       )}
       {...props}

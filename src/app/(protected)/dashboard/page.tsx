@@ -3,52 +3,19 @@ import { redirect } from "next/navigation";
 import {
   Activity,
   AlertTriangle,
-  ArrowLeftRight,
-  BarChart3,
-  Boxes,
   Camera,
-  Settings,
-  Sparkles,
 } from "lucide-react";
 
 import { Badge } from "@/components/reui/badge";
 import { ProtectedShell } from "@/components/foundation/protected-shell";
 import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
   getInventoryBatches,
   type MedicineBatchWithDetails,
 } from "@/lib/supabase/inventory";
 import { getCurrentProfile } from "@/lib/supabase/profiles";
 import { createClient } from "@/lib/supabase/server";
-
-function getBatchStatus(item: MedicineBatchWithDetails, today: Date) {
-  const diffDays = Math.ceil(
-    (new Date(item.expiry_date).getTime() - today.getTime()) /
-      (1000 * 60 * 60 * 24)
-  );
-
-  if (diffDays < 0) return "Expired";
-  if (diffDays <= 180) return `Expiring in ${diffDays}d`;
-  if (item.quantity > 0 && item.quantity <= 50) return "Low stock";
-
-  return "Stable";
-}
-
-function getStatusVariant(label: string) {
-  if (label === "Stable") return "success-light" as const;
-  if (label === "Low stock") return "info-light" as const;
-  if (label === "Expired") return "destructive-light" as const;
-  return "warning-light" as const;
-}
+import { DashboardOverviewClient } from "./dashboard-overview-client";
 
 export default async function DashboardPage() {
   const { profile, user } = await getCurrentProfile();
@@ -172,14 +139,10 @@ export default async function DashboardPage() {
     nearExpiry: nearExpiryCount + expiredCount,
     activeReferrals: activeReferralsCount,
   };
-
-  const inventoryRows = [...batches]
-    .sort(
-      (left, right) =>
-        new Date(left.expiry_date).getTime() -
-        new Date(right.expiry_date).getTime()
-    )
-    .slice(0, 6);
+  const stableBatchCount = Math.max(
+    batches.length - lowStockCount - nearExpiryCount - expiredCount,
+    0
+  );
 
   const aiInsightCards = [
     {
@@ -223,7 +186,7 @@ export default async function DashboardPage() {
     },
   ] as const;
 
-  const referralCards = [
+  const actionCards = [
     {
       title:
         activeReferralsCount > 0
@@ -248,51 +211,71 @@ export default async function DashboardPage() {
           : "Keep nearby center options ready, even while stock is still stable.",
       variant: metrics.lowStock > 0 ? "info-light" : "outline",
     },
+    {
+      title:
+        totalConsultationsToday > 0
+          ? "Dispense flow should stay ready today"
+          : "Dispense workspace is ready for the next patient",
+      description:
+        totalConsultationsToday > 0
+          ? "Consultation activity is already moving, so dispensing and patient handoff should be kept responsive."
+          : "No consultation queue is active yet, but the dispense and patient workspaces are available when demand starts.",
+      variant: totalConsultationsToday > 0 ? "success-light" : "outline",
+    },
   ] as const;
+
+  const stockStatusData = [
+    { name: "Stable", value: stableBatchCount, fill: "#16A34A" },
+    { name: "Low stock", value: lowStockCount, fill: "#F59E0B" },
+    { name: "Near expiry", value: nearExpiryCount, fill: "#F97316" },
+    { name: "Expired", value: expiredCount, fill: "#DC2626" },
+  ];
+
+  const operationsData = [
+    { name: "Consultations", value: totalConsultationsToday, fill: "#2563EB" },
+    { name: "Referrals", value: activeReferralsCount, fill: "#0D9488" },
+    { name: "Low stock", value: lowStockCount, fill: "#F59E0B" },
+    { name: "Expiry alerts", value: nearExpiryCount + expiredCount, fill: "#DC2626" },
+  ];
 
   return (
     <ProtectedShell title="Health Center Overview">
-      <div className="flex flex-1 flex-col gap-4">
+      <div className="flex flex-1 flex-col gap-5">
         <div className="grid auto-rows-min gap-4 xl:grid-cols-3">
-          <section className="min-h-[172px] rounded-xl border border-[#262626] bg-[#181818] p-5">
+          <section className="min-h-[188px] rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#111827]">
             <Badge variant="info-light" size="sm">
               Daily overview
             </Badge>
-            <h2 className="mt-4 text-xl font-semibold tracking-[-0.02em] text-[#fafafa]">
+            <h2 className="mt-4 text-xl font-semibold tracking-[-0.02em] text-[#1E293B] dark:text-slate-100">
               Welcome back, {profile?.display_name || user?.email || "Health Worker"}.
             </h2>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-[#a1a1aa]">
+            <p className="mt-2 max-w-xl text-sm leading-6 text-[#64748B] dark:text-slate-400">
               Review consultations, stock pressure, and referral work before
               scanning or dispensing.
             </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <Button asChild size="sm" className="h-8 rounded-md">
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+              <Button asChild className="w-full justify-center">
                 <Link href="/scan">
                   <Camera className="size-4" />
                   Open Scan
                 </Link>
               </Button>
-              <Button
-                asChild
-                size="sm"
-                variant="outline"
-                className="h-8 rounded-md border-[#3f3f46] bg-[#202020] text-[#fafafa] hover:bg-[#27272a]"
-              >
+              <Button asChild variant="outline" className="w-full justify-center">
                 <Link href="/dispense">
                   <Activity className="size-4" />
-                  Dispense
+                  Open Dispense
                 </Link>
               </Button>
             </div>
           </section>
 
-          <section className="min-h-[172px] rounded-xl border border-[#262626] bg-[#181818] p-5">
+          <section className="min-h-[188px] rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#111827]">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#9bb7e0]">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#2563EB] dark:text-[#93C5FD]">
                   Center status
                 </p>
-                <h3 className="mt-4 text-lg font-semibold text-[#fafafa]">
+                <h3 className="mt-4 text-lg font-semibold text-[#1E293B] dark:text-slate-100">
                   Keep service moving
                 </h3>
               </div>
@@ -301,301 +284,77 @@ export default async function DashboardPage() {
               </Badge>
             </div>
             <div className="mt-5 grid gap-2 text-sm">
-              <div className="flex items-center justify-between rounded-lg border border-[#343434] px-3 py-2">
-                <span className="text-[#a1a1aa]">Consultations</span>
-                <span className="font-semibold text-[#fafafa]">
+              <div className="flex items-center justify-between rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 dark:border-white/10 dark:bg-[#0F172A]">
+                <span className="text-[#64748B] dark:text-slate-400">Consultations</span>
+                <span className="font-semibold text-[#1E293B] dark:text-slate-100">
                   {totalConsultationsToday}
                 </span>
               </div>
-              <div className="flex items-center justify-between rounded-lg border border-[#343434] px-3 py-2">
-                <span className="text-[#a1a1aa]">Pending referrals</span>
-                <span className="font-semibold text-[#fafafa]">
+              <div className="flex items-center justify-between rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 dark:border-white/10 dark:bg-[#0F172A]">
+                <span className="text-[#64748B] dark:text-slate-400">Pending referrals</span>
+                <span className="font-semibold text-[#1E293B] dark:text-slate-100">
                   {activeReferralsCount}
                 </span>
               </div>
             </div>
           </section>
 
-          <section className="min-h-[172px] rounded-xl border border-[#262626] bg-[#181818] p-5">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#9bb7e0]">
+          <section className="min-h-[188px] rounded-3xl border border-[#E2E8F0] bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#111827]">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#2563EB] dark:text-[#93C5FD]">
               Stock watch
             </p>
             <div className="mt-6 grid grid-cols-3 gap-3">
-              <div>
-                <p className="text-3xl font-semibold text-[#fafafa]">{totalItems}</p>
-                <p className="mt-1 text-xs text-[#a1a1aa]">units</p>
+              <div className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-4 dark:border-white/10 dark:bg-[#0F172A]">
+                <p className="text-3xl font-semibold text-[#1E293B] dark:text-slate-100">{totalItems}</p>
+                <p className="mt-1 text-xs text-[#64748B] dark:text-slate-400">units</p>
               </div>
-              <div>
-                <p className="text-3xl font-semibold text-amber-300">
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4 dark:border-amber-900/30 dark:bg-amber-950/20">
+                <p className="text-3xl font-semibold text-amber-700 dark:text-amber-300">
                   {metrics.lowStock}
                 </p>
-                <p className="mt-1 text-xs text-[#a1a1aa]">low</p>
+                <p className="mt-1 text-xs text-amber-700/80 dark:text-amber-300/80">low</p>
               </div>
-              <div>
-                <p className="text-3xl font-semibold text-rose-300">
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-4 dark:border-rose-900/30 dark:bg-rose-950/20">
+                <p className="text-3xl font-semibold text-rose-700 dark:text-rose-300">
                   {metrics.nearExpiry}
                 </p>
-                <p className="mt-1 text-xs text-[#a1a1aa]">expiry</p>
+                <p className="mt-1 text-xs text-rose-700/80 dark:text-rose-300/80">expiry</p>
               </div>
             </div>
-            <Button
-              asChild
-              size="sm"
-              variant="outline"
-              className="mt-5 h-8 rounded-md border-[#3f3f46] bg-[#202020] text-[#fafafa] hover:bg-[#27272a]"
-            >
-              <Link href="/inventory">Open Full Inventory</Link>
-            </Button>
+            <p className="mt-5 text-sm leading-6 text-[#64748B] dark:text-slate-400">
+              Watch low-stock and expiry pressure here before it affects consultations and local dispensing.
+            </p>
           </section>
         </div>
 
         {criticalBatches.length > 0 ? (
-          <section className="rounded-xl border border-rose-400/20 bg-rose-500/5 p-4">
+          <section className="rounded-3xl border border-rose-200 bg-rose-50/80 p-5 dark:border-rose-900/30 dark:bg-rose-950/20">
             <div className="flex items-start gap-3">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-rose-500/10 text-rose-300">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300">
                 <AlertTriangle className="size-4" />
               </span>
               <div className="min-w-0 flex-1">
-                <h3 className="text-sm font-semibold text-[#fafafa]">
+                <h3 className="text-sm font-semibold text-rose-900 dark:text-rose-200">
                   Critical expiry alerts need attention
                 </h3>
-                <p className="mt-1 text-xs text-[#a1a1aa]">
+                <p className="mt-1 text-sm text-rose-700/90 dark:text-rose-300/90">
                   {expiredCount} expired and {nearExpiryCount} near-expiry batch
                   {nearExpiryCount === 1 ? "" : "es"} may affect patient service.
                 </p>
               </div>
-              <Button asChild size="sm" className="h-8 rounded-md">
+              <Button asChild size="sm">
                 <Link href="/inventory">Review</Link>
               </Button>
             </div>
           </section>
         ) : null}
 
-        <section
-          id="insight-tabs"
-          className="min-h-[calc(100vh-18.5rem)] flex-1 overflow-hidden rounded-xl border border-[#262626] bg-[#181818]"
-        >
-          <Tabs defaultValue="inventory" className="flex min-h-[560px] flex-col">
-            <div className="flex flex-col gap-4 border-b border-[#262626] p-5 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#9bb7e0]">
-                  Dashboard workspace
-                </p>
-                <h3 className="mt-2 text-base font-semibold text-[#fafafa]">
-                  Batch inventory snapshot
-                </h3>
-              </div>
-              <TabsList className="grid w-full grid-cols-3 lg:w-[430px]">
-                <TabsTrigger value="inventory">
-                  <Boxes className="size-4" />
-                  Inventory
-                </TabsTrigger>
-                <TabsTrigger value="insights">
-                  <BarChart3 className="size-4" />
-                  Insights
-                </TabsTrigger>
-                <TabsTrigger value="actions">
-                  <Settings className="size-4" />
-                  Actions
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value="inventory" className="mt-0 flex-1">
-              <div className="flex flex-col gap-4 p-5">
-                <div className="flex justify-end">
-                  <Button
-                    asChild
-                    size="sm"
-                    variant="outline"
-                    className="h-8 rounded-md border-[#3f3f46] bg-[#202020] text-[#fafafa] hover:bg-[#27272a]"
-                  >
-                    <Link href="/inventory">Open Full Inventory</Link>
-                  </Button>
-                </div>
-                <div className="overflow-hidden rounded-xl border border-[#343434]">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Medicine</TableHead>
-                        <TableHead>Batch</TableHead>
-                        <TableHead>Stock</TableHead>
-                        <TableHead>Expiry</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {inventoryRows.length > 0 ? (
-                        inventoryRows.map((item) => {
-                          const status = getBatchStatus(item, today);
-
-                          return (
-                            <TableRow key={item.id}>
-                              <TableCell>
-                                <div className="flex flex-col">
-                                  <span className="text-sm font-medium">
-                                    {item.medicine_master?.generic_name ||
-                                      "Medicine"}
-                                  </span>
-                                  <span className="text-xs text-[#a1a1aa]">
-                                    {item.medicine_master?.brand_name ||
-                                      "No brand name"}
-                                  </span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="font-mono text-xs text-[#d4d4d8]">
-                                {item.batch_number}
-                              </TableCell>
-                              <TableCell className="font-semibold">
-                                {item.quantity}
-                              </TableCell>
-                              <TableCell className="text-[#d4d4d8]">
-                                {new Date(item.expiry_date).toLocaleDateString(
-                                  "en-PH",
-                                  {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  }
-                                )}
-                              </TableCell>
-                              <TableCell>
-                                <Badge
-                                  variant={getStatusVariant(status)}
-                                  size="sm"
-                                >
-                                  {status}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-right">
-                                <div className="flex justify-end gap-1">
-                                  <Button
-                                    asChild
-                                    size="icon"
-                                    variant="ghost"
-                                    className="size-7 rounded-md text-[#fafafa] hover:bg-[#202020]"
-                                  >
-                                    <Link href="/inventory">
-                                      <Boxes
-                                        className="size-3.5"
-                                        aria-hidden="true"
-                                      />
-                                      <span className="sr-only">
-                                        Open inventory
-                                      </span>
-                                    </Link>
-                                  </Button>
-                                  <Button
-                                    asChild
-                                    size="icon"
-                                    variant="ghost"
-                                    className="size-7 rounded-md text-[#fafafa] hover:bg-[#202020]"
-                                  >
-                                    <Link href="/scan">
-                                      <Camera
-                                        className="size-3.5"
-                                        aria-hidden="true"
-                                      />
-                                      <span className="sr-only">
-                                        Scan medicine
-                                      </span>
-                                    </Link>
-                                  </Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })
-                      ) : (
-                        <TableRow>
-                          <TableCell
-                            colSpan={6}
-                            className="h-40 text-center text-sm text-[#a1a1aa]"
-                          >
-                            No medicine batch is available yet. Open Scan to add
-                            your first stock record.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="insights" className="mt-0 flex-1 p-5">
-              <div className="grid gap-3 lg:grid-cols-3">
-                {aiInsightCards.map((card) => (
-                  <div
-                    key={card.title}
-                    className="min-h-36 rounded-xl border border-[#343434] bg-[#111111] p-4"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="text-sm font-semibold text-[#fafafa]">
-                        {card.title}
-                      </p>
-                      <Badge variant={card.variant} size="xs">
-                        AI
-                      </Badge>
-                    </div>
-                    <p className="mt-3 text-xs leading-5 text-[#a1a1aa]">
-                      {card.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <Button asChild size="sm" className="mt-4 h-8 rounded-md">
-                <Link href="/ai-insights">
-                  <Sparkles className="size-4" />
-                  Open Insights
-                </Link>
-              </Button>
-            </TabsContent>
-
-            <TabsContent value="actions" className="mt-0 flex-1 p-5">
-              <div className="grid gap-3 lg:grid-cols-2">
-                {referralCards.map((card) => (
-                  <div
-                    key={card.title}
-                    className="min-h-36 rounded-xl border border-[#343434] bg-[#111111] p-4"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="text-sm font-semibold text-[#fafafa]">
-                        {card.title}
-                      </p>
-                      <Badge variant={card.variant} size="xs">
-                        Queue
-                      </Badge>
-                    </div>
-                    <p className="mt-3 text-xs leading-5 text-[#a1a1aa]">
-                      {card.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Button asChild size="sm" className="h-8 rounded-md">
-                  <Link href="/ai-insights">
-                    <Sparkles className="size-4" />
-                    Open Insights
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="sm"
-                  variant="outline"
-                  className="h-8 rounded-md border-[#3f3f46] bg-[#202020] text-[#fafafa] hover:bg-[#27272a]"
-                >
-                  <Link href="/referrals">
-                    <ArrowLeftRight className="size-4" />
-                    Open Referrals
-                  </Link>
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </section>
+        <DashboardOverviewClient
+          insightCards={aiInsightCards}
+          actionCards={actionCards}
+          stockStatusData={stockStatusData}
+          operationsData={operationsData}
+        />
       </div>
     </ProtectedShell>
   );

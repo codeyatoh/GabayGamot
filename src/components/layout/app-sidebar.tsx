@@ -82,13 +82,13 @@ export function AppSidebar({ user, isAdmin, roleLabel, ...props }: AppSidebarPro
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href={isAdmin ? "/admin" : "/dashboard"}>
-                <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-[#1d4ed8] text-white shadow-sm">
+                <div className="flex aspect-square size-11 items-center justify-center rounded-2xl border border-[#D8E5F2] bg-white text-white shadow-[0_16px_36px_-22px_rgba(37,99,235,0.55)] dark:border-white/10 dark:bg-[#0F172A]">
                   <Image
                     alt="GabayGamot logo"
-                    className="size-7 object-contain"
-                    height={28}
+                    className="size-8 object-contain"
+                    height={32}
                     src="/assets/images/gabay-gamot-logo-sm.png"
-                    width={28}
+                    width={32}
                     priority
                   />
                 </div>

@@ -5,6 +5,7 @@ import { AlertOctagon, ArrowRight, CheckCircle2, ShieldAlert, Sparkles } from "l
 
 import type { ActionableInsight, InsightScope, InsightSeverity } from "@/types/ai-insights";
 import { NOT_ENOUGH_INSIGHT_DATA_MESSAGE } from "@/types/ai-insights";
+import { Button } from "@/components/ui/button";
 
 type InsightApiResponse = {
   insights?: ActionableInsight[];
@@ -132,15 +133,15 @@ export function AiInsightsClient({ scope = "local" }: AiInsightsClientProps) {
             </div>
           </div>
 
-          <button
-            type="button"
+          <Button
             onClick={handleGenerateInsights}
             disabled={isLoading}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#2563EB] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/10 transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60"
+            size="lg"
+            className="rounded-2xl px-5 shadow-lg shadow-blue-500/10"
           >
             {isLoading ? "Analyzing data..." : "Generate Insights"}
             <ArrowRight className="size-4" />
-          </button>
+          </Button>
         </div>
       </div>
 

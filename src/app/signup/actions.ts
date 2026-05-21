@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { getAppUrl } from "@/lib/env/public";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   ensureProfileForUser,
   updateProfileById,
@@ -34,6 +34,14 @@ function onboardingMessagePath(message: string) {
 function getRegistrationActionErrorMessage(error: unknown) {
   const message =
     error instanceof Error ? error.message : "We could not finish your registration.";
+
+  if (message.toLowerCase().includes("already been registered")) {
+    return "This email is already registered. Please log in instead.";
+  }
+
+  if (message.toLowerCase().includes("already registered")) {
+    return "This email is already registered. Please log in instead.";
+  }
 
   if (message.toLowerCase().includes("proof document")) {
     return message;
@@ -127,33 +135,31 @@ export async function registerBhw(formData: FormData) {
     redirect(signupMessagePath(proofValidation));
   }
 
+  const admin = createAdminClient();
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
+  const { data, error } = await admin.auth.admin.createUser({
     email,
     password,
-    options: {
-      emailRedirectTo: `${getAppUrl()}/auth/confirm?next=/pending-approval`,
-    },
+    email_confirm: true,
   });
 
-  console.log("Supabase signUp results - user:", data.user?.id, "error:", error?.message);
-
   if (error) {
-    redirect(signupMessagePath(error.message));
+    redirect(signupMessagePath(getRegistrationActionErrorMessage(error)));
   }
 
   if (!data.user) {
     redirect(
       signupMessagePath(
-        "Registration blocked by security rules. This usually happens if the email is already registered but unconfirmed. Please check your inbox for a previous confirmation link, or use a different email."
+        "We could not create your account right now. Please try again."
       )
     );
   }
 
   if (!profileValidation.values || !proofDocument) {
-    console.error("Signup validation mismatch: values=", !!profileValidation.values, "proof=", !!proofDocument);
     redirect(signupMessagePath("We could not finish your registration."));
   }
+
+  let registrationCompleted = false;
 
   try {
     await ensureProfileForUser({
@@ -176,23 +182,31 @@ export async function registerBhw(formData: FormData) {
         ...profileValidation.location,
       });
     }
+    registrationCompleted = true;
   } catch (error) {
     console.error("BHW registration failed:", error);
+    if (!registrationCompleted) {
+      await admin.auth.admin.deleteUser(data.user.id).catch(() => undefined);
+    }
     redirect(signupMessagePath(getRegistrationActionErrorMessage(error)));
   }
 
-  revalidatePath("/", "layout");
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-  if (data.session) {
-    redirect("/pending-approval");
+  if (signInError) {
+    redirect(
+      "/login?message=" +
+        encodeURIComponent(
+          "Registration completed, but automatic sign-in failed. Please log in with your new account."
+        )
+    );
   }
 
-  redirect(
-    "/login?message=" +
-      encodeURIComponent(
-        "Registration submitted. Check your email to confirm your account, then log in."
-      )
-  );
+  revalidatePath("/", "layout");
+  redirect("/pending-approval");
 }
 
 export async function completeBhwRegistration(formData: FormData) {

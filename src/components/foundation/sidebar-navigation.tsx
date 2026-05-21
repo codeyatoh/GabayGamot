@@ -16,6 +16,8 @@ import {
   Users,
 } from "lucide-react";
 
+import { cn } from "@/lib/utils";
+
 interface RouteItem {
   href: string;
   label: string;
@@ -45,31 +47,73 @@ const adminRoutes: RouteItem[] = [
 
 export function SidebarNavigation({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
-  const routes = isAdmin ? adminRoutes : bhwRoutes;
+  const routeGroups = isAdmin
+    ? [
+        {
+          label: "Platform",
+          items: adminRoutes.slice(0, 3),
+        },
+        {
+          label: "Projects",
+          items: adminRoutes.slice(3),
+        },
+      ]
+    : [
+        {
+          label: "Platform",
+          items: bhwRoutes.slice(0, 6),
+        },
+        {
+          label: "Projects",
+          items: bhwRoutes.slice(6),
+        },
+      ];
 
   return (
-    <nav className="space-y-1">
-      {routes.map((route) => {
-        const Icon = route.icon;
-        const isActive =
-          pathname === route.href ||
-          (route.href !== "/admin" && route.href !== "/dashboard" && pathname.startsWith(route.href));
+    <div className="space-y-4">
+      {routeGroups.map((group) => (
+        <div key={group.label}>
+          <p className="px-2 py-1 text-[11px] font-medium text-[#b9d6dd]">
+            {group.label}
+          </p>
+          <nav className="space-y-1">
+            {group.items.map((route) => {
+              const Icon = route.icon;
+              const isActive =
+                pathname === route.href ||
+                (route.href !== "/admin" &&
+                  route.href !== "/dashboard" &&
+                  pathname.startsWith(route.href));
 
-        return (
-          <Link
-            key={route.href}
-            href={route.href}
-            className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200 ${
-              isActive
-                ? "bg-[#EFF6FF] text-[#2563EB] dark:bg-white/10 dark:text-[#60A5FA]"
-                : "text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#1E293B] dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-slate-100"
-            }`}
-          >
-            <Icon className={`size-5 shrink-0 ${isActive ? "text-[#2563EB] dark:text-[#60A5FA]" : "text-[#94A3B8] group-hover:text-[#64748B]"}`} />
-            <span>{route.label}</span>
-          </Link>
-        );
-      })}
-    </nav>
+              return (
+                <Link
+                  key={route.href}
+                  href={route.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn(
+                    "group flex h-8 items-center gap-2 rounded-md px-2 text-xs font-semibold outline-none transition",
+                    isActive
+                      ? "text-white"
+                      : "text-white hover:bg-[#202020]"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex size-4 shrink-0 items-center justify-center transition-colors",
+                      isActive
+                        ? "text-white"
+                        : "text-white/90 group-hover:text-white"
+                    )}
+                  >
+                    <Icon className="size-4" />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">{route.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      ))}
+    </div>
   );
 }

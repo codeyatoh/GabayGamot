@@ -106,6 +106,14 @@ export function SignupStepper() {
 
   const [healthCenterName, setHealthCenterName] = useState("");
   const [proofDocumentName, setProofDocumentName] = useState<string | null>(null);
+  const [locationData, setLocationData] = useState({
+    province: "",
+    municipality: "",
+    barangayName: "",
+    latitude: "",
+    longitude: "",
+    mapboxPlaceName: "",
+  });
 
   // ── Validation per step ──────────────────────────────────────────────────
   const passwordChecks = [
@@ -129,8 +137,16 @@ export function SignupStepper() {
     if (step === 5) {
       if (!proofDocumentName) return "Please upload a PDF or Word proof document.";
     }
+    if (step === 4) {
+      if (!locationData.province || !locationData.municipality || !locationData.barangayName) {
+        return "Please select the province, city or municipality, and barangay.";
+      }
+      if (!locationData.latitude || !locationData.longitude) {
+        return "Please drop the exact health center pin on the map.";
+      }
+    }
     return null;
-  }, [step, firstName, lastName, email, password, contactNumber, proofDocumentName]);
+  }, [step, firstName, lastName, email, password, contactNumber, proofDocumentName, locationData]);
 
   const handleNext = useCallback(() => {
     const err = validateCurrentStep();
@@ -153,6 +169,12 @@ export function SignupStepper() {
 
   return (
     <form ref={formRef} action={registerBhw}>
+      <input type="hidden" name="province" value={locationData.province} />
+      <input type="hidden" name="municipality" value={locationData.municipality} />
+      <input type="hidden" name="barangayName" value={locationData.barangayName} />
+      <input type="hidden" name="latitude" value={locationData.latitude} />
+      <input type="hidden" name="longitude" value={locationData.longitude} />
+      <input type="hidden" name="mapboxPlaceName" value={locationData.mapboxPlaceName} />
       <Stepper
         value={step}
         onValueChange={(v) => {
@@ -346,7 +368,10 @@ export function SignupStepper() {
 
           {/* STEP 4 — Location */}
           <StepperContent value={4} className="space-y-5">
-            <MapLocationPicker />
+            <MapLocationPicker
+              showHiddenInputs={false}
+              onLocationDataChange={setLocationData}
+            />
           </StepperContent>
 
           {/* STEP 5 — Verification Documents */}
@@ -359,7 +384,33 @@ export function SignupStepper() {
             </div>
             <div className="space-y-2">
               <label className={LABEL_CLS} htmlFor="proofDocument">Proof Document</label>
-              <input accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] file:mr-4 file:rounded-xl file:border-0 file:bg-[#2563EB] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#1D4ED8] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:file:bg-[#2563EB] cursor-pointer" id="proofDocument" name="proofDocument" required type="file" onChange={(e) => setProofDocumentName(e.target.files?.[0]?.name ?? null)} />
+              <div className="relative overflow-hidden rounded-2xl border border-[#DBEAFE] bg-[#F8FAFC] shadow-sm transition hover:border-[#93C5FD] dark:border-slate-700 dark:bg-white/5 dark:hover:border-[#60A5FA]">
+                <input
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+                  id="proofDocument"
+                  name="proofDocument"
+                  required
+                  type="file"
+                  onChange={(e) => setProofDocumentName(e.target.files?.[0]?.name ?? null)}
+                />
+                <div className="flex items-center gap-3 px-4 py-4">
+                  <span className="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-sm dark:bg-[#3B82F6]">
+                    Select File
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-[#1E293B] dark:text-slate-100">
+                      {proofDocumentName || "No file selected yet"}
+                    </p>
+                    <p className="text-xs text-[#64748B] dark:text-slate-400">
+                      Tap anywhere in this box to open your files.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-[#64748B] dark:text-slate-400">
+                PDF, DOC, or DOCX only. Maximum 5 MB.
+              </p>
               <p className="text-xs text-[#64748B] dark:text-slate-400">Upload your BHW accreditation, endorsement letter, or other official proof document.</p>
             </div>
           </StepperContent>
@@ -392,7 +443,13 @@ export function SignupStepper() {
                     section: "Health Center",
                     rows: [
                       { label: "Health Center Name", value: healthCenterName || "—" },
-                      { label: "Address Source", value: "PSGC address picker and map pin" },
+                      {
+                        label: "Selected Address",
+                        value:
+                          [locationData.barangayName, locationData.municipality, locationData.province]
+                            .filter(Boolean)
+                            .join(", ") || "â€”",
+                      },
                     ],
                   },
                   {
@@ -432,21 +489,30 @@ export function SignupStepper() {
         {/* ── Navigation buttons ── */}
         <div className="flex items-center justify-between gap-4 border-t border-[#E2E8F0] pt-6 dark:border-slate-700">
           {step > 1 ? (
-            <Button type="button" variant="outline" onClick={handleBack} className="flex items-center gap-2">
+            <Button key="back-button" type="button" variant="outline" onClick={handleBack} className="flex items-center gap-2">
               <ChevronLeft className="size-4" /> Back
             </Button>
           ) : (
-            <Button asChild variant="ghost" className="text-[#64748B]">
+            <Button key="back-link" asChild variant="ghost" className="text-[#64748B]">
               <Link href="/login">← Back to Login</Link>
             </Button>
           )}
 
           {step < STEPS.length ? (
-            <Button type="button" onClick={handleNext} className="flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8]">
+            <Button
+              key={`next-step-${step}`}
+              type="button"
+              onClick={handleNext}
+              className="flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8]"
+            >
               Next <ChevronRight className="size-4" />
             </Button>
           ) : (
-            <Button type="submit" className="flex items-center gap-2 bg-[#16A34A] hover:bg-[#15803D]">
+            <Button
+              key="submit-registration"
+              type="submit"
+              className="flex items-center gap-2 bg-[#16A34A] hover:bg-[#15803D]"
+            >
               <Check className="size-4" /> Submit Registration
             </Button>
           )}

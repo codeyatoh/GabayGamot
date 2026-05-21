@@ -803,6 +803,18 @@ A targeted UI implementation for the **Features Section**, **How It Works Sectio
 - browser check on `/login`
 - browser redirect check from `/dashboard` to `/login`
 - browser check on `/signup`
+- proof document upload check on signup/onboarding after native input alignment
+- browser verification on `/signup` Step 5 confirmed the proof document input opens the native file chooser and accepts a selected file
+- replaced the proof upload field with a full-area native file overlay so the entire upload box opens the file chooser on signup and onboarding
+- fixed the Step 5 to Step 6 transition by forcing the `Next` and `Submit Registration` actions to render as distinct button instances, preventing accidental form submit on the first Step 6 transition
+- fixed the submit-time runtime crash by aligning the live `bhw-proof-documents` storage bucket MIME rules with the app policy (`PDF`, `DOC`, `DOCX`) and adding guarded server-action redirects for registration/onboarding failures
+- fixed the Step 6 signup submit path so location values are owned by the parent stepper form instead of only living inside the Step 4 map panel, preventing province, municipality, barangay, and pin coordinates from being lost before final submit
+- refreshed the protected dashboard shell with a cleaner topbar, grouped sidebar navigation, and profile action dropdown while preserving role-based links and active route logic
+- replaced the BHW dashboard mock activity feed with a real batch inventory table built from the current `medicine_batches` data already loaded on the page
+- upgraded the BHW dashboard into a cleaner bento-style layout using real metrics, real inventory status rows, AI insight summary cards, and referral readiness cards
+- `npm run lint`
+- `npm run typecheck`
+- `npm run build`
 
 ## Errors Fixed
 
@@ -819,6 +831,9 @@ A targeted UI implementation for the **Features Section**, **How It Works Sectio
 - Added pending-approval gating so incomplete or non-approved BHW accounts stay out of protected routes
 - Added proof document validation and upload support for the BHW intake flow
 - Fixed the profile bootstrap behavior so existing approval status is not overwritten during later sign-ins
+- Replaced the proof document chooser wrapper with a native visible file input so the browser picker opens reliably on signup and onboarding
+- Restyled the protected shell and BHW dashboard without changing auth checks, Supabase route guards, or existing protected links
+- Replaced the BHW dashboard fake recent transaction list with a real inventory table snapshot drawn from actual batch data
 
 ## Manual Setup Needed
 

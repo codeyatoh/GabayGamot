@@ -31,6 +31,25 @@ function onboardingMessagePath(message: string) {
   return `/onboarding?message=${encodeURIComponent(message)}`;
 }
 
+function getRegistrationActionErrorMessage(error: unknown) {
+  const message =
+    error instanceof Error ? error.message : "We could not finish your registration.";
+
+  if (message.toLowerCase().includes("proof document")) {
+    return message;
+  }
+
+  if (message.toLowerCase().includes("bucket")) {
+    return "Proof document storage is not ready yet. Please try again in a moment.";
+  }
+
+  if (message.toLowerCase().includes("mime")) {
+    return "The selected proof document format is not allowed yet. Please use PDF, DOC, or DOCX.";
+  }
+
+  return "We could not finish your registration right now. Please try again.";
+}
+
 function validateProfileFields(formData: FormData) {
   const firstName = getFormValue(formData, "firstName");
   const middleName = getFormValue(formData, "middleName");
@@ -136,25 +155,30 @@ export async function registerBhw(formData: FormData) {
     redirect(signupMessagePath("We could not finish your registration."));
   }
 
-  await ensureProfileForUser({
-    id: data.user.id,
-    email: data.user.email ?? undefined,
-  });
-
-  const proofDocumentPath = await uploadProofDocument(data.user.id, proofDocument);
-
-  await updateProfileById(data.user.id, {
-    ...profileValidation.values,
-    proof_document_path: proofDocumentPath,
-    role: "bhw",
-    approval_status: "pending",
-  });
-
-  if (profileValidation.location) {
-    await upsertHealthCenter({
-      profile_id: data.user.id,
-      ...profileValidation.location,
+  try {
+    await ensureProfileForUser({
+      id: data.user.id,
+      email: data.user.email ?? undefined,
     });
+
+    const proofDocumentPath = await uploadProofDocument(data.user.id, proofDocument);
+
+    await updateProfileById(data.user.id, {
+      ...profileValidation.values,
+      proof_document_path: proofDocumentPath,
+      role: "bhw",
+      approval_status: "pending",
+    });
+
+    if (profileValidation.location) {
+      await upsertHealthCenter({
+        profile_id: data.user.id,
+        ...profileValidation.location,
+      });
+    }
+  } catch (error) {
+    console.error("BHW registration failed:", error);
+    redirect(signupMessagePath(getRegistrationActionErrorMessage(error)));
   }
 
   revalidatePath("/", "layout");
@@ -197,20 +221,25 @@ export async function completeBhwRegistration(formData: FormData) {
     redirect(onboardingMessagePath("We could not finish your registration."));
   }
 
-  const proofDocumentPath = await uploadProofDocument(user.id, proofDocument);
+  try {
+    const proofDocumentPath = await uploadProofDocument(user.id, proofDocument);
 
-  await updateProfileById(user.id, {
-    ...profileValidation.values,
-    proof_document_path: proofDocumentPath,
-    role: "bhw",
-    approval_status: "pending",
-  });
-
-  if (profileValidation.location) {
-    await upsertHealthCenter({
-      profile_id: user.id,
-      ...profileValidation.location,
+    await updateProfileById(user.id, {
+      ...profileValidation.values,
+      proof_document_path: proofDocumentPath,
+      role: "bhw",
+      approval_status: "pending",
     });
+
+    if (profileValidation.location) {
+      await upsertHealthCenter({
+        profile_id: user.id,
+        ...profileValidation.location,
+      });
+    }
+  } catch (error) {
+    console.error("BHW onboarding completion failed:", error);
+    redirect(onboardingMessagePath(getRegistrationActionErrorMessage(error)));
   }
 
   revalidatePath("/", "layout");

@@ -143,17 +143,31 @@ export default async function OnboardingPage({
               <label className="text-sm font-medium text-[#1E293B] dark:text-slate-100" htmlFor="proofDocument">
                 Proof Document
               </label>
-              <input
-                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                className="w-full rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm text-[#1E293B] file:mr-4 file:rounded-xl file:border-0 file:bg-[#2563EB] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#1D4ED8] dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:file:bg-[#2563EB]"
-                id="proofDocument"
-                name="proofDocument"
-                required
-                type="file"
-              />
+              <div className="relative overflow-hidden rounded-2xl border border-[#DBEAFE] bg-[#F8FAFC] shadow-sm transition hover:border-[#93C5FD] dark:border-slate-700 dark:bg-white/5 dark:hover:border-[#60A5FA]">
+                <input
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+                  id="proofDocument"
+                  name="proofDocument"
+                  required
+                  type="file"
+                />
+                <div className="flex items-center gap-3 px-4 py-4">
+                  <span className="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white shadow-sm dark:bg-[#3B82F6]">
+                    Select File
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-[#1E293B] dark:text-slate-100">
+                      Choose your proof document
+                    </p>
+                    <p className="text-xs text-[#64748B] dark:text-slate-400">
+                      Tap anywhere in this box to open your files.
+                    </p>
+                  </div>
+                </div>
+              </div>
               <p className="text-xs leading-6 text-[#64748B] dark:text-slate-400">
-                Upload one supporting file such as a valid ID, BHW accreditation,
-                or health center endorsement. PDF or Word document only, up to 5MB.
+                PDF, DOC, or DOCX only, up to 5MB.
               </p>
             </div>
 

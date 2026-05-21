@@ -1,9 +1,7 @@
-import Image from "next/image";
-import Link from "next/link";
 import { type ReactNode } from "react";
 
 import { getCurrentProfile } from "@/lib/supabase/profiles";
-import { SidebarNavigation } from "./sidebar-navigation";
+import { ProtectedAppShell } from "./protected-app-shell";
 
 function formatApprovalStatus(status: string | null | undefined, role?: string) {
   if (role === "super_admin") {
@@ -20,6 +18,22 @@ function formatApprovalStatus(status: string | null | undefined, role?: string) 
     .join(" ");
 }
 
+function getInitials(value: string) {
+  const parts = value
+    .split(" ")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (parts.length === 0) {
+    return "GG";
+  }
+
+  return parts
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
 export async function ProtectedShell({
   children,
   title,
@@ -32,139 +46,22 @@ export async function ProtectedShell({
   const subtitle = profile?.email || user?.email || "Authenticated account";
   const approvalStatus = formatApprovalStatus(profile?.approval_status, profile?.role);
   const isAdmin = profile?.role === "super_admin";
-
-  const sidebarContent = (
-    <>
-      <Link className="mb-6 flex items-center gap-3" href="/">
-        <span className="flex size-10 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#EFF6FF] dark:border-white/10 dark:bg-white/5">
-          <Image
-            alt="GabayGamot logo"
-            className="size-6 object-contain"
-            height={24}
-            src="/assets/images/gabay-gamot-logo-sm.png"
-            width={24}
-            priority
-          />
-        </span>
-        <div>
-          <p className="text-sm font-semibold text-[#1E293B] dark:text-slate-100">
-            GabayGamot
-          </p>
-          <p className="text-xs text-[#64748B] dark:text-slate-400">
-            {isAdmin ? "Admin Panel" : "Protected dashboard"}
-          </p>
-        </div>
-      </Link>
-
-      <div className="mb-6 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 dark:border-white/10 dark:bg-white/5">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#64748B] dark:text-slate-400">
-          Signed In
-        </p>
-        <p className="mt-2 text-sm font-semibold text-[#1E293B] dark:text-slate-100">
-          {displayName}
-        </p>
-        <p className="mt-1 break-all text-xs text-[#64748B] dark:text-slate-400">
-          {subtitle}
-        </p>
-        <p className="mt-3 text-xs font-medium text-[#0D9488] dark:text-[#5EEAD4]">
-          {approvalStatus}
-        </p>
-      </div>
-
-      <SidebarNavigation isAdmin={isAdmin} />
-
-      <form action="/auth/signout" className="mt-6" method="post">
-        <button
-          className="w-full rounded-2xl border border-[#E2E8F0] px-4 py-3 text-sm font-medium text-[#1E293B] transition hover:border-[#BFDBFE] hover:bg-[#EFF6FF] hover:text-[#2563EB] dark:border-white/10 dark:text-slate-100 dark:hover:border-white/15 dark:hover:bg-white/10 dark:hover:text-[#93C5FD]"
-          type="submit"
-        >
-          Sign Out
-        </button>
-      </form>
-    </>
-  );
+  const roleLabel = isAdmin ? "Super Admin" : "BHW";
+  const workspaceLabel = isAdmin ? "Admin workspace" : "Barangay workspace";
+  const userInitials = getInitials(displayName);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A]">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:gap-6 sm:px-6 sm:py-6 lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:px-8">
-        <div className="rounded-3xl border border-[#E2E8F0] bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#111827] lg:hidden">
-          <div className="flex items-center justify-between gap-3">
-            <Link className="flex min-w-0 items-center gap-3" href="/">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-[#E2E8F0] bg-[#EFF6FF] dark:border-white/10 dark:bg-white/5">
-                <Image
-                  alt="GabayGamot logo"
-                  className="size-6 object-contain"
-                  height={24}
-                  src="/assets/images/gabay-gamot-logo-sm.png"
-                  width={24}
-                  priority
-                />
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-[#1E293B] dark:text-slate-100">
-                  GabayGamot
-                </p>
-                <p className="truncate text-xs text-[#64748B] dark:text-slate-400">
-                  {isAdmin ? "Admin Panel" : "Protected dashboard"}
-                </p>
-              </div>
-            </Link>
-            <span className="shrink-0 rounded-full bg-[#EFF6FF] px-3 py-1 text-[11px] font-semibold text-[#2563EB] dark:bg-white/10 dark:text-[#93C5FD]">
-              {isAdmin ? "Admin" : "BHW"}
-            </span>
-          </div>
-
-          <details className="mt-4 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-3 dark:border-white/10 dark:bg-white/5">
-            <summary className="cursor-pointer list-none text-sm font-semibold text-[#1E293B] outline-none marker:hidden dark:text-slate-100">
-              <span className="flex items-center justify-between gap-3">
-                <span>Open navigation</span>
-                <span className="text-xs font-medium text-[#64748B] dark:text-slate-400">
-                  {approvalStatus}
-                </span>
-              </span>
-            </summary>
-
-            <div className="mt-4">
-              <div className="mb-4 rounded-2xl border border-[#E2E8F0] bg-white p-4 dark:border-white/10 dark:bg-[#111827]">
-                <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#64748B] dark:text-slate-400">
-                  Signed In
-                </p>
-                <p className="mt-2 text-sm font-semibold text-[#1E293B] dark:text-slate-100">
-                  {displayName}
-                </p>
-                <p className="mt-1 break-all text-xs text-[#64748B] dark:text-slate-400">
-                  {subtitle}
-                </p>
-              </div>
-              <SidebarNavigation isAdmin={isAdmin} />
-              <form action="/auth/signout" className="mt-4" method="post">
-                <button
-                  className="w-full rounded-2xl border border-[#E2E8F0] px-4 py-3 text-sm font-medium text-[#1E293B] transition hover:border-[#BFDBFE] hover:bg-[#EFF6FF] hover:text-[#2563EB] dark:border-white/10 dark:text-slate-100 dark:hover:border-white/15 dark:hover:bg-white/10 dark:hover:text-[#93C5FD]"
-                  type="submit"
-                >
-                  Sign Out
-                </button>
-              </form>
-            </div>
-          </details>
-        </div>
-
-        <aside className="hidden h-fit rounded-3xl border border-[#E2E8F0] bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#111827] lg:block">
-          {sidebarContent}
-        </aside>
-
-        <main className="rounded-3xl border border-[#E2E8F0] bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#111827] sm:p-6">
-          <div className="mb-8">
-            <p className="text-sm font-medium uppercase tracking-[0.24em] text-[#64748B] dark:text-slate-400">
-              Foundation route
-            </p>
-            <h1 className="mt-3 text-2xl font-semibold text-[#1E293B] dark:text-slate-100 sm:text-3xl">
-              {title}
-            </h1>
-          </div>
-          {children}
-        </main>
-      </div>
-    </div>
+    <ProtectedAppShell
+      approvalStatus={approvalStatus}
+      displayName={displayName}
+      isAdmin={isAdmin}
+      roleLabel={roleLabel}
+      subtitle={subtitle}
+      title={title}
+      userInitials={userInitials}
+      workspaceLabel={workspaceLabel}
+    >
+      {children}
+    </ProtectedAppShell>
   );
 }

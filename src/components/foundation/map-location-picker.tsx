@@ -149,10 +149,21 @@ export function MapLocationPicker({
   defaultProvince = "",
   defaultMunicipality = "",
   defaultBarangay = "",
+  showHiddenInputs = true,
+  onLocationDataChange,
 }: {
   defaultProvince?: string;
   defaultMunicipality?: string;
   defaultBarangay?: string;
+  showHiddenInputs?: boolean;
+  onLocationDataChange?: (value: {
+    province: string;
+    municipality: string;
+    barangayName: string;
+    latitude: string;
+    longitude: string;
+    mapboxPlaceName: string;
+  }) => void;
 }) {
   const mapRef = useRef<MapRef | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -346,6 +357,20 @@ export function MapLocationPicker({
     }
   }, [barangayName, municipalityName, provinceName, focusMapOnPlace]);
 
+  useEffect(() => {
+    onLocationDataChange?.({
+      province: provinceName,
+      municipality: municipalityName,
+      barangayName,
+      latitude: marker ? String(marker.latitude) : "",
+      longitude: marker ? String(marker.longitude) : "",
+      mapboxPlaceName:
+        marker && barangayName && municipalityName && provinceName
+          ? `${barangayName}, ${municipalityName}, ${provinceName}`
+          : "",
+    });
+  }, [barangayName, marker, municipalityName, onLocationDataChange, provinceName]);
+
   const onMapClick = useCallback((event: MapLayerMouseEvent) => {
     setMarker({
       longitude: event.lngLat.lng,
@@ -382,10 +407,10 @@ export function MapLocationPicker({
 
   return (
     <div className="space-y-4">
-      <input type="hidden" name="province" value={provinceName} />
-      <input type="hidden" name="municipality" value={municipalityName} />
-      <input type="hidden" name="barangayName" value={barangayName} />
-      {marker && (
+      {showHiddenInputs && <input type="hidden" name="province" value={provinceName} />}
+      {showHiddenInputs && <input type="hidden" name="municipality" value={municipalityName} />}
+      {showHiddenInputs && <input type="hidden" name="barangayName" value={barangayName} />}
+      {showHiddenInputs && marker && (
         <>
           <input type="hidden" name="latitude" value={marker.latitude} />
           <input type="hidden" name="longitude" value={marker.longitude} />

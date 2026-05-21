@@ -82,19 +82,19 @@ export function AppSidebar({ user, isAdmin, roleLabel, ...props }: AppSidebarPro
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href={isAdmin ? "/admin" : "/dashboard"}>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-[#1d4ed8] text-white">
+                <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-[#1d4ed8] text-white shadow-sm">
                   <Image
                     alt="GabayGamot logo"
-                    className="size-4 object-contain"
-                    height={16}
+                    className="size-7 object-contain"
+                    height={28}
                     src="/assets/images/gabay-gamot-logo-sm.png"
-                    width={16}
+                    width={28}
                     priority
                   />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">GabayGamot</span>
-                  <span className="truncate text-xs">{roleLabel}</span>
+                  <span className="truncate font-bold tracking-tight">GabayGamot</span>
+                  <span className="truncate text-xs text-sidebar-foreground/60">{roleLabel}</span>
                 </div>
               </Link>
             </SidebarMenuButton>

@@ -2,30 +2,61 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ─── Design Tokens ──────────────────────────────────────────────────────── */
 :root {
-  --background: #f8fafc;
-  --foreground: #1e293b;
+  /* Light mode — clean clinical palette with GabayGamot blue brand */
+  --background: #f0f4f8;
+  --foreground: #0f1c2e;
   --card: #ffffff;
-  --card-foreground: #1e293b;
-  --border: #e2e8f0;
-  --muted: #eff6ff;
-  --muted-foreground: #64748b;
-  --primary: #2563eb;
+  --card-foreground: #0f1c2e;
+  --border: #c9d8eb;
+  --muted: #e2ecf8;
+  --muted-foreground: #4e6a8a;
+  --primary: #1d4ed8;
   --primary-foreground: #ffffff;
   --secondary: #0d9488;
   --secondary-foreground: #ffffff;
-  --ring: rgba(37, 99, 235, 0.35);
-  --radius: 1rem;
-  --sidebar: hsl(0 0% 98%);
-  --sidebar-foreground: hsl(240 5.3% 26.1%);
-  --sidebar-primary: hsl(240 5.9% 10%);
-  --sidebar-primary-foreground: hsl(0 0% 98%);
-  --sidebar-accent: hsl(240 4.8% 95.9%);
-  --sidebar-accent-foreground: hsl(240 5.9% 10%);
-  --sidebar-border: hsl(220 13% 91%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --ring: rgba(29, 78, 216, 0.30);
+  --radius: 0.75rem;
+
+  /* Sidebar — bright white, crisp borders */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f1c2e;
+  --sidebar-primary: #1d4ed8;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e2ecf8;
+  --sidebar-accent-foreground: #0f1c2e;
+  --sidebar-border: #c9d8eb;
+  --sidebar-ring: rgba(29, 78, 216, 0.40);
 }
 
+.dark {
+  /* Dark mode — deep navy, premium healthcare feel */
+  --background: #08111f;
+  --foreground: #e2edf8;
+  --card: #0e1b2e;
+  --card-foreground: #e2edf8;
+  --border: rgba(130, 170, 215, 0.13);
+  --muted: rgba(29, 78, 216, 0.14);
+  --muted-foreground: #7498b8;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #14b8a6;
+  --secondary-foreground: #ffffff;
+  --ring: rgba(96, 165, 250, 0.35);
+
+  /* Sidebar — deep navy panel */
+  --sidebar: #0b1626;
+  --sidebar-foreground: #bcd4ec;
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #112038;
+  --sidebar-accent-foreground: #e2edf8;
+  --sidebar-border: rgba(130, 170, 215, 0.10);
+  --sidebar-ring: rgba(96, 165, 250, 0.45);
+}
+
+/* ─── Tailwind theme mapping ─────────────────────────────────────────────── */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -39,66 +70,43 @@
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-ring: var(--ring);
-  --radius-xl: calc(var(--radius) + 0.5rem);
-  --radius-2xl: calc(var(--radius) + 1rem);
-  --radius-3xl: calc(var(--radius) + 1.5rem);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-xl: calc(var(--radius) + 0.25rem);
+  --radius-2xl: calc(var(--radius) + 0.75rem);
+  --radius-3xl: calc(var(--radius) + 1.25rem);
+
   --font-sans: "Segoe UI", Inter, Arial, sans-serif;
   --font-mono: "Cascadia Code", Consolas, monospace;
+
   --animate-shine-border: shine-rotation 8s linear infinite;
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
 
   @keyframes shine-rotation {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
   }
 
   @keyframes accordion-down {
     from { height: 0; opacity: 0; }
-    to { height: var(--radix-accordion-content-height); opacity: 1; }
+    to   { height: var(--radix-accordion-content-height); opacity: 1; }
   }
 
   @keyframes accordion-up {
     from { height: var(--radix-accordion-content-height); opacity: 1; }
-    to { height: 0; opacity: 0; }
+    to   { height: 0; opacity: 0; }
   }
 }
 
-.dark {
-  --background: #08111f;
-  --foreground: #f8fafc;
-  --card: #101b2d;
-  --card-foreground: #f8fafc;
-  --border: rgba(226, 232, 240, 0.18);
-  --muted: rgba(37, 99, 235, 0.12);
-  --muted-foreground: #cbd5e1;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-  --secondary: #14b8a6;
-  --secondary-foreground: #ffffff;
-  --ring: rgba(96, 165, 250, 0.35);
-  --sidebar: hsl(240 5.9% 10%);
-  --sidebar-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-primary: hsl(224.3 76.3% 48%);
-  --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(240 3.7% 15.9%);
-  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-border: hsl(240 3.7% 15.9%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
-}
-
+/* ─── Base Styles ────────────────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -133,13 +141,10 @@ select {
   font: inherit;
 }
 
+/* ─── Utilities ──────────────────────────────────────────────────────────── */
 @keyframes shine-rotation {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .animate-shine-border {
